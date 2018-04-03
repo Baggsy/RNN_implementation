@@ -132,8 +132,8 @@ def train_model(x_train, y_train, validation_split, epoch_train, mini_batch_size
         y_pred = np.concatenate((a, b), axis=1)
 
         # Calculating the balanced accuracy
-        TP = sum(((y_pred == [1, 0])[:, 0]) & ((y_pred == y_test[i])[:, 0]))*1.0
-        TN = sum(((y_pred == [0, 1])[:, 0]) & ((y_pred == y_test[i])[:, 0]))*1.0
+        TP = sum(((y_pred == [1, 0])[:, 0]) & (((y_pred == y_test[i]).astype(int))[:, 0]))*1.0
+        TN = sum(((y_pred == [0, 1])[:, 0]) & (((y_pred == y_test[i]).astype(int))[:, 0]))*1.0
         P = sum((y_test[i] == [1, 0])[:, 0])*1.0
         N = sum((y_test[i] == [0, 1])[:, 0])*1.0
         bal_accuracy[i] = (TP/P + TN/N)/2.0

@@ -42,14 +42,13 @@ def read_data(n_folds):
         csv_y_test = path + "y" + start_test + str(i) + file_type_end
 
         x_train[i] = np.array(list(csv.reader(open(csv_x_train))))
-        y_train[i] = np.array(list(csv.reader(open(csv_y_train))))
+        y_train[i] = np.array(list(csv.reader(open(csv_y_train)))).astype(int)
         x_test[i] = np.array(list(csv.reader(open(csv_x_test))))
-        y_test[i] = np.array(list(csv.reader(open(csv_y_test))))
+        y_test[i] = np.array(list(csv.reader(open(csv_y_test)))).astype(int)
 
         # Reshape to tensor input shape for LSTM
         x_train[i] = np.reshape(x_train[i], (x_train[i].shape[0], 1, x_train[i].shape[1]))
         x_test[i] = np.reshape(x_test[i], (x_test[i].shape[0], 1, x_test[i].shape[1]))
-
 
     return x_train, x_test, y_train, y_test
 
@@ -106,7 +105,7 @@ def train_model(x_train, y_train, validation_split, epoch_train, mini_batch_size
     predicted_labels[2] = model3.predict(x_test[2])
     predicted_labels[3] = model4.predict(x_test[3])
 
-    for i in range(0, n_folds):
+    for i in range(0, 1):#n_folds):
         a = np.array([predicted_labels[i][:, 0]]).transpose()
         b = np.array([predicted_labels[i][:, 1]]).transpose()
         a = np.array(a >= b).astype(int)
@@ -114,10 +113,10 @@ def train_model(x_train, y_train, validation_split, epoch_train, mini_batch_size
         y_pred = np.concatenate((a, b), axis=1)
 
         # Calculating the balanced accuracy
-        TP = sum(((y_pred == [1, 0])[:, 0]) & ((y_pred == y_test[i])[:, 0]))*1.0
-        TN = sum(((y_pred == [0, 1])[:, 0]) & ((y_pred == y_test[i])[:, 0]))*1.0
-        P = sum((y_test[i] == [1, 0])[:, 0])*1.0
-        N = sum((y_test[i] == [0, 1])[:, 0])*1.0
+        TP = sum(((y_pred == [1, 0])[:, 0]) & (((y_pred == y_test[i]).astype(int))[:, 0]))*1.0
+        TN = sum(((y_pred == [0, 1])[:, 0]) & (((y_pred == y_test[i]).astype(int))[:, 0]))*1.0
+        P = sum(((y_test[i] == [1, 0]).astype(int))[:, 0])*1.0
+        N = sum(((y_test[i] == [0, 1]).astype(int))[:, 0])*1.0
         bal_accuracy[i] = (TP/P + TN/N)/2.0
         print("TP:", TP)
         print("TN:", TN)

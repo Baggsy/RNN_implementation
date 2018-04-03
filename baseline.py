@@ -11,7 +11,7 @@ import time
 mini_batch_size = 32
 embedding_size = 8
 learning_rate = 0.001
-epoch_train = 300  # maximum repetitions
+epoch_train = 1#300  # maximum repetitions
 validation_split = 0.05
 optimizer = RMSprop(lr=learning_rate)
 metrics = ['accuracy']
@@ -40,9 +40,6 @@ bal_accuracy = np.zeros(n_folds)
 
 # Reading the data from the read_data function
 x_train, x_test, y_train, y_test = read_data(n_folds)
-
-print np.shape(x_train)
-print np.shape(x_train[0])
 
 # in_shape defines the input shape of the LSTM modules
 in_shape = len(x_train[0][0][0])  # data length variable for the input tensor
