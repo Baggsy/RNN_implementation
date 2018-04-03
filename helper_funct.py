@@ -105,7 +105,7 @@ def train_model(x_train, y_train, validation_split, epoch_train, mini_batch_size
     predicted_labels[2] = model3.predict(x_test[2])
     predicted_labels[3] = model4.predict(x_test[3])
 
-    for i in range(0, 1):#n_folds):
+    for i in range(0, n_folds):
         a = np.array([predicted_labels[i][:, 0]]).transpose()
         b = np.array([predicted_labels[i][:, 1]]).transpose()
         a = np.array(a >= b).astype(int)
