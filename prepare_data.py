@@ -65,20 +65,20 @@ path = "data/"
 for i in range(0, n_folds):
 
     # writing data to separate files
-    with open(path + "x_train[" + str(i) + "].csv","w+") as my_csv:
-        csvWriter = csv.writer(my_csv,delimiter=',')
+    with open(path + "x_train[" + str(i) + "].csv", "w+") as my_csv:
+        csvWriter = csv.writer(my_csv, delimiter=',')
         csvWriter.writerows(x_train[i])
 
-    with open(path + "y_train[" + str(i) + "].csv","w+") as my_csv:
-        csvWriter = csv.writer(my_csv,delimiter=',')
+    with open(path + "y_train[" + str(i) + "].csv", "w+") as my_csv:
+        csvWriter = csv.writer(my_csv, delimiter=',')
         csvWriter.writerows(y_train[i])
 
-    with open(path + "x_test[" + str(i) + "].csv","w+") as my_csv:
-        csvWriter = csv.writer(my_csv,delimiter=',')
+    with open(path + "x_test[" + str(i) + "].csv", "w+") as my_csv:
+        csvWriter = csv.writer(my_csv, delimiter=',')
         csvWriter.writerows(x_test[i])
 
-    with open(path + "y_test[" + str(i) + "].csv","w+") as my_csv:
-        csvWriter = csv.writer(my_csv,delimiter=',')
+    with open(path + "y_test[" + str(i) + "].csv", "w+") as my_csv:
+        csvWriter = csv.writer(my_csv, delimiter=',')
         csvWriter.writerows(y_test[i])
 
 
