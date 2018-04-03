@@ -41,12 +41,9 @@ bal_accuracy = np.zeros(n_folds)
 # Reading the data from the read_data function
 x_train, x_test, y_train, y_test = read_data(n_folds)
 
-<<<<<<< b5a285f3860a2909677cbc7f4c9de18a2ac32305
 print np.shape(x_train)
 print np.shape(x_train[0])
 
-=======
->>>>>>> Working version
 # in_shape defines the input shape of the LSTM modules
 in_shape = len(x_train[0][0][0])  # data length variable for the input tensor
 

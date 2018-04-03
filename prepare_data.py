@@ -12,15 +12,9 @@ y_train = [[] for _ in xrange(n_folds)]
 y_test = [[] for _ in xrange(n_folds)]
 
 # Naming convention of the files
-<<<<<<< b5a285f3860a2909677cbc7f4c9de18a2ac32305
 file_str_data = "backup/csv_training_cells_"
 file_type = ".csv"
 file_str_truth = "backup/csv_truth_cells_"
-=======
-file_str_data = "csv_training_cells_"
-file_type = ".csv"
-file_str_truth = "csv_truth_cells_"
->>>>>>> Working version
 
 # Reading the data files
 for i in range(0, n_sets):
@@ -65,7 +59,7 @@ x_test[3] = np.concatenate((x[2], x[4]), axis=0)
 y_train[3] = np.concatenate((y_OneHotEncoded[0], y_OneHotEncoded[1], y_OneHotEncoded[3], y_OneHotEncoded[5], y_OneHotEncoded[6], y_OneHotEncoded[7]), axis=0)
 y_test[3] = np.concatenate((y_OneHotEncoded[2], y_OneHotEncoded[4]), axis=0)
 
-<<<<<<< b5a285f3860a2909677cbc7f4c9de18a2ac32305
+
 path = "data/"
 
 for i in range(0, n_folds):
@@ -84,26 +78,7 @@ for i in range(0, n_folds):
         csvWriter.writerows(x_test[i])
 
     with open(path + "y_test[" + str(i) + "].csv","w+") as my_csv:
-=======
-for i in range(0, n_folds):
-    x_train[i] = np.reshape(x_train[i], (x_train[i].shape[0], 1, x_train[i].shape[1]))
-    x_test[i] = np.reshape(x_test[i], (x_test[i].shape[0], 1, x_test[i].shape[1]))
-
-    # writing data to separate files
-    with open("x_train[" + str(i) + "].csv","w+") as my_csv:
-        csvWriter = csv.writer(my_csv,delimiter=',')
-        csvWriter.writerows(x_train[i])
-
-    with open("y_train[" + str(i) + "].csv","w+") as my_csv:
-        csvWriter = csv.writer(my_csv,delimiter=',')
-        csvWriter.writerows(y_train[i])
-
-    with open("x_test[" + str(i) + "].csv","w+") as my_csv:
-        csvWriter = csv.writer(my_csv,delimiter=',')
-        csvWriter.writerows(x_test[i])
-
-    with open("y_test[" + str(i) + "].csv","w+") as my_csv:
->>>>>>> Working version
         csvWriter = csv.writer(my_csv,delimiter=',')
         csvWriter.writerows(y_test[i])
+
 

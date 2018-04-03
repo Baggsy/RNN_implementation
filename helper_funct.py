@@ -4,10 +4,7 @@ from tensorflow.python.keras.optimizers import RMSprop
 from tensorflow.python.keras.callbacks import Callback
 import csv
 
-<<<<<<< b5a285f3860a2909677cbc7f4c9de18a2ac32305
 
-=======
->>>>>>> Working version
 class EarlyStoppingByLossVal(Callback):
     def __init__(self, monitor='loss', value=0.0005, verbose=1):
         super(Callback, self).__init__()
@@ -26,12 +23,7 @@ class EarlyStoppingByLossVal(Callback):
                 self.model.stop_training = True
 
 
-<<<<<<< b5a285f3860a2909677cbc7f4c9de18a2ac32305
 def read_data(n_folds):
-=======
-def read_data(n_sets, n_folds):
->>>>>>> Working version
-
     x_train = [[] for _ in xrange(n_folds)]
     x_test = [[] for _ in xrange(n_folds)]
     y_train = [[] for _ in xrange(n_folds)]
@@ -41,34 +33,24 @@ def read_data(n_sets, n_folds):
     start_train = "_train["
     start_test = "_test["
     file_type_end = "].csv"
-<<<<<<< b5a285f3860a2909677cbc7f4c9de18a2ac32305
+
     path = "data/"
     for i in range(0, n_folds):
         csv_x_train = path + "x" + start_train + str(i) + file_type_end
         csv_y_train = path + "y" + start_train + str(i) + file_type_end
         csv_x_test = path + "x" + start_test + str(i) + file_type_end
         csv_y_test = path + "y" + start_test + str(i) + file_type_end
-=======
-
-    for i in range(0, n_folds):
-        csv_x_train = "x" + start_train + str(i) + file_type_end
-        csv_y_train = "y" + start_train + str(i) + file_type_end
-        csv_x_test = "x" + start_test + str(i) + file_type_end
-        csv_y_test = "y" + start_test + str(i) + file_type_end
->>>>>>> Working version
 
         x_train[i] = np.array(list(csv.reader(open(csv_x_train))))
         y_train[i] = np.array(list(csv.reader(open(csv_y_train))))
         x_test[i] = np.array(list(csv.reader(open(csv_x_test))))
         y_test[i] = np.array(list(csv.reader(open(csv_y_test))))
 
-<<<<<<< b5a285f3860a2909677cbc7f4c9de18a2ac32305
         # Reshape to tensor input shape for LSTM
         x_train[i] = np.reshape(x_train[i], (x_train[i].shape[0], 1, x_train[i].shape[1]))
         x_test[i] = np.reshape(x_test[i], (x_test[i].shape[0], 1, x_test[i].shape[1]))
 
-=======
->>>>>>> Working version
+
     return x_train, x_test, y_train, y_test
 
 
