@@ -19,7 +19,7 @@ class EarlyStoppingByLossVal(Callback):
         else:
             if current < self.value or logs.get('acc') < 0.05 or logs.get('loss') > 5:
                 if self.verbose > 0:
-                    print("\nAcc: %.02f. Loss: %.02f\n" % logs.get('acc'), logs.get('loss'))
+                    print "Acc: ", logs.get('acc'), " Loss: ", logs.get('loss')
                 self.model.stop_training = True
 
 
