@@ -65,7 +65,6 @@ def plot_hist(history, i):
 
 
 def clone_model(model, custom_objects={}):
-    # Requires Keras 1.0.7 since get_config has breaking changes.
     config = {
         'class_name': model.__class__.__name__,
         'config': model.get_config(),
