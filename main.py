@@ -19,7 +19,7 @@ bias_init = 'random_normal'
 
 # Model parameters
 units = [500]
-layers = [1]
+layers = [5]
 lstm_type = ['Bidirectional']
 activation = 'softmax'
 loss_function = 'binary_crossentropy'
@@ -88,7 +88,7 @@ for unit in units:
             del model
 
             # Saving the balanced accuracy over the 4 folds
-            balanced_accuracy[units.index(unit), layers.index(n_layers), lstm_type.index(type)] = mean(bal_accuracy[:])
+            balanced_accuracy[units.index(unit), layers.index(n_layers), lstm_type.index(type)] = bal_accuracy.mean()
 
             run_time2 = time.time() - start_time2
             print "run time of units ", unit, " n_layers ", n_layers, " of type ", type, ": ", run_time2
