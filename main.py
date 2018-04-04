@@ -57,19 +57,21 @@ for unit in units:
             model = Sequential()
             # Adding the LSTM layers or the Bidirectional LSTM modules
             if type == 'LSTM':
-                for j in range(0, n_layers-1):
-                    if j == 0:
-                        model.add(LSTM(units=unit, input_shape=(time_steps, in_shape), return_sequences=True, bias_initializer=bias_init))
-                    else:
+                if n_layers > 1:
+                    model.add(LSTM(units=unit, input_shape=(time_steps, in_shape), return_sequences=True, bias_initializer=bias_init))
+                    for j in range(1, n_layers-1):
                         model.add(LSTM(units=unit, return_sequences=True, bias_initializer=bias_init))
-                model.add(LSTM(units=unit, bias_initializer=bias_init))
+                    model.add(LSTM(units=unit, bias_initializer=bias_init))
+                else:
+                    model.add(LSTM(units=unit, input_shape=(time_steps, in_shape), bias_initializer=bias_init))
             else:
-                for j in range(0, n_layers-1):
-                    if j == 0:
-                        model.add(Bidirectional(LSTM(units=unit, return_sequences=True, bias_initializer=bias_init), input_shape=(time_steps, in_shape), merge_mode=merge_mode))
-                    else:
+                if n_layers > 1:
+                    model.add(Bidirectional(LSTM(units=unit, return_sequences=True, bias_initializer=bias_init), input_shape=(time_steps, in_shape), merge_mode=merge_mode))
+                    for j in range(1, n_layers-1):
                         model.add(Bidirectional(LSTM(units=unit, return_sequences=True, bias_initializer=bias_init), merge_mode=merge_mode))
                     model.add(Bidirectional(LSTM(units=unit, bias_initializer=bias_init), merge_mode=merge_mode))
+                else:
+                    model.add(Bidirectional(LSTM(units=unit, bias_initializer=bias_init), input_shape=(time_steps, in_shape), merge_mode=merge_mode))
 
             # Adding the rest of the network's components
             model.add(Dense(units=num_classes, bias_initializer=bias_init))
