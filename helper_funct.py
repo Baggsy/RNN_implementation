@@ -88,7 +88,7 @@ def train_model(x_train, y_train, validation_split, epoch_train, mini_batch_size
     model3.compile(loss='binary_crossentropy', optimizer=RMSprop(lr=learning_rate), metrics=['accuracy'])
     model4.compile(loss='binary_crossentropy', optimizer=RMSprop(lr=learning_rate), metrics=['accuracy'])
 
-    history1 = model1.fit(x_train[0], y_train[0], validation_split=validation_split, epochs=1, batch_size=mini_batch_size, callbacks=callbacks)
+    history1 = model1.fit(x_train[0], y_train[0], validation_split=validation_split, epochs=epoch_train, batch_size=mini_batch_size, callbacks=callbacks)
     history2 = model2.fit(x_train[1], y_train[1], validation_split=validation_split, epochs=epoch_train, batch_size=mini_batch_size, callbacks=callbacks)
     history3 = model3.fit(x_train[2], y_train[2], validation_split=validation_split, epochs=epoch_train, batch_size=mini_batch_size, callbacks=callbacks)
     history4 = model4.fit(x_train[3], y_train[3], validation_split=validation_split, epochs=epoch_train, batch_size=mini_batch_size, callbacks=callbacks)
