@@ -70,7 +70,7 @@ def clone_model(model, custom_objects={}):
         'config': model.get_config(),
     }
     clone = model_from_config(config, custom_objects=custom_objects)
-    clone.set_weights(model.get_weights())
+    # clone.set_weights(model.get_weights())
     return clone
 
 

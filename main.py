@@ -20,7 +20,7 @@ bias_init = 'random_normal'
 # Model parameters
 units = [500, 1000]
 layers = [1]
-lstm_type = ['LSTM', 'Bidirectional']
+lstm_type = ['Bidirectional', 'LSTM']
 activation = 'softmax'
 loss_function = 'binary_crossentropy'
 merge_mode = 'concat'
