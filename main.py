@@ -18,7 +18,7 @@ metrics = ['accuracy']
 bias_init = 'random_normal'
 
 # Model parameters
-units = [500, 1000]
+units = [500]
 layers = [1]
 lstm_type = ['Bidirectional']
 activation = 'softmax'
