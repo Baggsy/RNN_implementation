@@ -20,7 +20,7 @@ bias_init = 'random_normal'
 # Model parameters
 units = [500, 1000]
 layers = [1]
-lstm_type = ['Bidirectional', 'LSTM']
+lstm_type = ['Bidirectional']
 activation = 'softmax'
 loss_function = 'binary_crossentropy'
 merge_mode = 'concat'
@@ -94,7 +94,8 @@ for unit in units:
             print "run time of units ", unit, " n_layers ", n_layers, " of type ", type, ": ", run_time2
 
 run_time = time.time() - start_time
-print "balanced_accuracy: ", balanced_accuracy
+print "balanced_accuracy: "
+print balanced_accuracy
 print "Total run time: ", run_time
 
 balanced_accuracy_final = balanced_accuracy.mean()
