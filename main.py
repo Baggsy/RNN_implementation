@@ -50,7 +50,9 @@ start_time = time.time()
 for unit in units:
     for n_layers in layers:
         for type in lstm_type:
-
+            print "unit: ", unit
+            print "n_layers: ", n_layers
+            print "type: ", type
             start_time2 = time.time()
             model = Sequential()
             # Adding the LSTM layers or the Bidirectional LSTM modules
@@ -66,7 +68,7 @@ for unit in units:
             # Adding the rest of the network's components
             model.add(Dense(units=num_classes, bias_initializer=bias_init))
             model.add(Activation(activation=activation))
-            model.compile(loss=loss_function, optimizer=optimizer, metrics=metrics)
+            # model.compile(loss=loss_function, optimizer=optimizer, metrics=metrics)
             model.summary()
 
             # training of the model
