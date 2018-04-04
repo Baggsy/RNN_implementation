@@ -17,9 +17,9 @@ class EarlyStoppingByLossVal(Callback):
         if current is None:
             warnings.warn("Early stopping requires %s available!" % self.monitor, RuntimeWarning)
         else:
-            if current < self.value:
+            if current < self.value or logs.get('acc') < 0.05 or logs.get('loss') > 5:
                 if self.verbose > 0:
-                    print("\nEpoch %05d: early stopping THR\n" % epoch)
+                    print("\nAcc: %.02f. Loss: %.02f\n" % logs.get('acc'), logs.get('loss'))
                 self.model.stop_training = True
 
 
@@ -70,7 +70,7 @@ def clone_model(model, custom_objects={}):
         'config': model.get_config(),
     }
     clone = model_from_config(config, custom_objects=custom_objects)
-    # clone.set_weights(model.get_weights())
+    clone.set_weights(model.get_weights())
     return clone
 
 
@@ -104,7 +104,7 @@ def train_model(x_train, y_train, validation_split, epoch_train, mini_batch_size
     predicted_labels[2] = model3.predict(x_test[2])
     predicted_labels[3] = model4.predict(x_test[3])
 
-    for i in range(0, n_folds):
+    for i in range(0, 1):#n_folds):
         a = np.array([predicted_labels[i][:, 0]]).transpose()
         b = np.array([predicted_labels[i][:, 1]]).transpose()
         a = np.array(a >= b).astype(int)
