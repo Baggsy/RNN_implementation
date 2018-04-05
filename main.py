@@ -108,8 +108,8 @@ start_time = time.time()
 # ______________________________________________________
 
 
-unit = 500
-n_layers = 2
+unit = 1000
+n_layers = 5
 type = 'LSTM'
 model = Sequential()
 model.add(LSTM(units=unit, return_sequences=True, input_shape=(time_steps, in_shape)))
