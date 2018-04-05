@@ -48,22 +48,38 @@ in_shape = len(x_train[0][0][0])  # data length variable for the input tensor
 start_time = time.time()
 
 unit = 500
-n_layers = 5
+n_layers = 1
 type = 'Bidirectional'
-
 model = Sequential()
-model.add(Bidirectional(LSTM(units=unit, return_sequences=True, bias_initializer=bias_init), input_shape=(time_steps, in_shape), merge_mode=merge_mode))
-model.add(Bidirectional(LSTM(units=unit, return_sequences=True, bias_initializer=bias_init), merge_mode=merge_mode))
-model.add(Bidirectional(LSTM(units=unit, return_sequences=True, bias_initializer=bias_init), merge_mode=merge_mode))
-model.add(Bidirectional(LSTM(units=unit, return_sequences=True, bias_initializer=bias_init), merge_mode=merge_mode))
-model.add(Bidirectional(LSTM(units=unit, bias_initializer=bias_init), merge_mode=merge_mode))
+model.add(Bidirectional(LSTM(units=unit, bias_initializer=bias_init), input_shape=(time_steps, in_shape), merge_mode=merge_mode))
 model.add(Dense(units=num_classes, bias_initializer=bias_init))
 model.add(Activation(activation=activation))
 # model.compile(loss=loss_function, optimizer=optimizer, metrics=metrics)
 model.summary()
 bal_accuracy = train_model(x_train, y_train, validation_split, epoch_train, mini_batch_size,
                            callbacks, x_test, y_test, model, n_folds, learning_rate)
-balanced_accuracy[units.index(unit), layers.index(n_layers), lstm_type.index(type)] = mean(bal_accuracy[:])
+
+print "bal_accuracy: ", bal_accuracy
+balanced_accuracy = mean(bal_accuracy[:])
+
+# unit = 500
+# n_layers = 5
+# type = 'Bidirectional'
+# model = Sequential()
+# model.add(Bidirectional(LSTM(units=unit, return_sequences=True, bias_initializer=bias_init), input_shape=(time_steps, in_shape), merge_mode=merge_mode))
+# model.add(Bidirectional(LSTM(units=unit, return_sequences=True, bias_initializer=bias_init), merge_mode=merge_mode))
+# model.add(Bidirectional(LSTM(units=unit, return_sequences=True, bias_initializer=bias_init), merge_mode=merge_mode))
+# model.add(Bidirectional(LSTM(units=unit, return_sequences=True, bias_initializer=bias_init), merge_mode=merge_mode))
+# model.add(Bidirectional(LSTM(units=unit, bias_initializer=bias_init), merge_mode=merge_mode))
+# model.add(Dense(units=num_classes, bias_initializer=bias_init))
+# model.add(Activation(activation=activation))
+# # model.compile(loss=loss_function, optimizer=optimizer, metrics=metrics)
+# model.summary()
+# bal_accuracy = train_model(x_train, y_train, validation_split, epoch_train, mini_batch_size,
+#                            callbacks, x_test, y_test, model, n_folds, learning_rate)
+#
+# print "bal_accuracy: ", bal_accuracy
+# balanced_accuracy = mean(bal_accuracy[:])
 
 #
 # for unit in units:
