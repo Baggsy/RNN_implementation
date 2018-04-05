@@ -18,9 +18,9 @@ metrics = ['accuracy']
 bias_init = 'random_normal'
 
 # Model parameters
-units = [500]
-layers = [5]
-lstm_type = ['Bidirectional']
+units = [500, 1000]
+layers = [1, 5, 10]
+lstm_type = ['LSTM', 'Bidirectional']
 activation = 'softmax'
 loss_function = 'binary_crossentropy'
 merge_mode = 'concat'
@@ -33,7 +33,7 @@ time_steps = 1
 
 # Defined callbacks. One for tensorboard and another for stopping the training at loss < 0.0005
 tbCallBack = keras.callbacks.TensorBoard(log_dir='./Graph', histogram_freq=0, write_graph=True, write_images=True)
-EarlyStopping = EarlyStoppingByLossVal(monitor='loss', value=0.000005, verbose=1)
+EarlyStopping = EarlyStoppingByLossVal(monitor='loss', value=0.00005, verbose=1)
 callbacks = [EarlyStopping]
 
 # initialing the output array
@@ -47,19 +47,25 @@ x_train, x_test, y_train, y_test = read_data(n_folds)
 in_shape = len(x_train[0][0][0])  # data length variable for the input tensor
 start_time = time.time()
 
-unit = 500
-n_layers = 1
-type = 'LSTM'
-model = Sequential()
-model.add(LSTM(units=unit, bias_initializer=bias_init, input_shape=(time_steps, in_shape)))
-model.add(Dense(units=num_classes, bias_initializer=bias_init))
-model.add(Activation(activation=activation))
-# model.compile(loss=loss_function, optimizer=optimizer, metrics=metrics)
-model.summary()
-bal_accuracy = train_model(x_train, y_train, validation_split, epoch_train, mini_batch_size,
-                           callbacks, x_test, y_test, model, n_folds, learning_rate)
-print "bal_accuracy: ", bal_accuracy
-balanced_accuracy = mean(bal_accuracy[:])
+
+# ______________________________________________________
+
+# unit = 500
+# n_layers = 1
+# type = 'LSTM'
+# model = Sequential()
+# model.add(LSTM(units=unit, bias_initializer=bias_init, input_shape=(time_steps, in_shape)))
+# model.add(Dense(units=num_classes, bias_initializer=bias_init))
+# model.add(Activation(activation=activation))
+# # model.compile(loss=loss_function, optimizer=optimizer, metrics=metrics)
+# model.summary()
+# bal_accuracy = train_model(x_train, y_train, validation_split, epoch_train, mini_batch_size,
+#                            callbacks, x_test, y_test, model, n_folds, learning_rate)
+# print "bal_accuracy: ", bal_accuracy
+# balanced_accuracy = mean(bal_accuracy[:])
+
+
+# ______________________________________________________
 
 
 # unit = 1000
@@ -75,6 +81,9 @@ balanced_accuracy = mean(bal_accuracy[:])
 #                            callbacks, x_test, y_test, model, n_folds, learning_rate)
 # print "bal_accuracy: ", bal_accuracy
 # balanced_accuracy = mean(bal_accuracy[:])
+
+
+# ______________________________________________________
 
 # unit = 500
 # n_layers = 5
@@ -94,6 +103,33 @@ balanced_accuracy = mean(bal_accuracy[:])
 #
 # print "bal_accuracy: ", bal_accuracy
 # balanced_accuracy = mean(bal_accuracy[:])
+
+
+# ______________________________________________________
+
+
+unit = 500
+n_layers = 5
+type = 'LSTM'
+model = Sequential()
+model.add(LSTM(units=unit, return_sequences=True, bias_initializer=bias_init, input_shape=(time_steps, in_shape)))
+model.add(LSTM(units=unit, return_sequences=True, bias_initializer=bias_init))
+model.add(LSTM(units=unit, return_sequences=True, bias_initializer=bias_init))
+model.add(LSTM(units=unit, return_sequences=True, bias_initializer=bias_init))
+model.add(LSTM(units=unit, bias_initializer=bias_init))
+model.add(Dense(units=num_classes, bias_initializer=bias_init))
+model.add(Activation(activation=activation))
+# model.compile(loss=loss_function, optimizer=optimizer, metrics=metrics)
+model.summary()
+bal_accuracy = train_model(x_train, y_train, validation_split, epoch_train, mini_batch_size,
+                           callbacks, x_test, y_test, model, n_folds, learning_rate)
+
+print "bal_accuracy: ", bal_accuracy
+balanced_accuracy = mean(bal_accuracy[:])
+
+
+# ______________________________________________________
+
 
 #
 # for unit in units:
