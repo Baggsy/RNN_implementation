@@ -109,10 +109,10 @@ start_time = time.time()
 
 
 unit = 500
-n_layers = 5
+n_layers = 2
 type = 'LSTM'
 model = Sequential()
-model.add(LSTM(units=unit, return_sequences=True, bias_initializer=bias_init, input_shape=(time_steps, in_shape)))
+model.add(LSTM(units=unit, return_sequences=True, stateful=True, bias_initializer=bias_init, input_shape=(time_steps, in_shape)))
 # model.add(LSTM(units=unit, return_sequences=True, bias_initializer=bias_init))
 # model.add(LSTM(units=unit, return_sequences=True, bias_initializer=bias_init))
 # model.add(LSTM(units=unit, return_sequences=True, bias_initializer=bias_init))
