@@ -10,7 +10,7 @@ import time
 # HYPER Parameters
 mini_batch_size = 32
 embedding_size = 8
-learning_rate = 0.001
+learning_rate = 0.0005
 epoch_train = 300  # maximum repetitions
 validation_split = 0.05
 optimizer = RMSprop(lr=learning_rate)
@@ -33,7 +33,7 @@ time_steps = 1
 
 # Defined callbacks. One for tensorboard and another for stopping the training at loss < 0.0005
 tbCallBack = keras.callbacks.TensorBoard(log_dir='./Graph', histogram_freq=0, write_graph=True, write_images=True)
-EarlyStopping = EarlyStoppingByLossVal(monitor='loss', value=0.00005, verbose=1)
+EarlyStopping = EarlyStoppingByLossVal(monitor='acc', value=0.95, verbose=1)
 callbacks = [EarlyStopping]
 
 # initialing the output array

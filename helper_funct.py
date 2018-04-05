@@ -7,7 +7,7 @@ import csv
 
 class EarlyStoppingByLossVal(Callback):
 
-    def __init__(self, monitor='loss', value=0.00005, verbose=1):
+    def __init__(self, monitor='acc', value=0.95, verbose=1):
         super(Callback, self).__init__()
         self.monitor = monitor
         self.value = value
@@ -18,7 +18,7 @@ class EarlyStoppingByLossVal(Callback):
         if current is None:
             warnings.warn("Early stopping requires %s available!" % self.monitor, RuntimeWarning)
         else:
-            if current < self.value or (epoch > 20 and (logs.get('acc') < 0.05 or logs.get('loss') > 5)):
+            if current > self.value or logs.get('acc') < 0.05:
                 if self.verbose > 0:
                     print "Acc: ", logs.get('acc'), " Loss: ", logs.get('loss')
                 self.model.stop_training = True
