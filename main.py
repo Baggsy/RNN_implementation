@@ -33,7 +33,7 @@ time_steps = 1
 
 # Defined callbacks. One for tensorboard and another for stopping the training at loss < 0.0005
 tbCallBack = keras.callbacks.TensorBoard(log_dir='./Graph', histogram_freq=0, write_graph=True, write_images=True)
-EarlyStopping = EarlyStoppingByLossVal(monitor='loss', value=0.0005, verbose=1)
+EarlyStopping = EarlyStoppingByLossVal(monitor='loss', value=0.005, verbose=1)
 callbacks = [EarlyStopping]
 
 # initialing the output array
@@ -47,7 +47,7 @@ x_train, x_test, y_train, y_test = read_data(n_folds)
 in_shape = len(x_train[0][0][0])  # data length variable for the input tensor
 start_time = time.time()
 
-unit = 1000
+unit = 500
 n_layers = 1
 type = 'LSTM'
 model = Sequential()
