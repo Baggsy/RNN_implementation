@@ -47,7 +47,7 @@ x_train, x_test, y_train, y_test = read_data(n_folds)
 in_shape = len(x_train[0][0][0])  # data length variable for the input tensor
 start_time = time.time()
 
-unit = 500
+unit = 1000
 n_layers = 1
 type = 'Bidirectional'
 model = Sequential()
