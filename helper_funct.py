@@ -56,11 +56,11 @@ def read_data(n_folds):
 
 def plot_hist(history, i):
     plt.plot(history.history['loss'])
-    plt.plot(history.history['val_loss'])
+    # plt.plot(history.history['val_loss'])
     plt.title('model loss')
     plt.ylabel('loss')
     plt.xlabel('epoch')
-    plt.legend(['train', 'test'], loc='upper left')
+    plt.legend(['train'+str(i)], loc='upper left')
     # plt.show()
     savefig('loss_function_' + str(i) + 'fold.png')
 
