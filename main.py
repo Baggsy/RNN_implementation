@@ -33,7 +33,7 @@ time_steps = 1
 
 # Defined callbacks. One for tensorboard and another for stopping the training at loss < 0.0005
 tbCallBack = keras.callbacks.TensorBoard(log_dir='./Graph', histogram_freq=0, write_graph=True, write_images=True)
-EarlyStopping = EarlyStoppingByLossVal(monitor='loss', value=0.00005, verbose=1)
+EarlyStopping = EarlyStoppingByLossVal(monitor='loss', value=0.0005, verbose=1)
 callbacks = [EarlyStopping]
 
 # initialing the output array
@@ -49,18 +49,32 @@ start_time = time.time()
 
 unit = 1000
 n_layers = 1
-type = 'Bidirectional'
+type = 'LSTM'
 model = Sequential()
-model.add(Bidirectional(LSTM(units=unit, bias_initializer=bias_init), input_shape=(time_steps, in_shape), merge_mode=merge_mode))
+model.add(LSTM(units=unit, bias_initializer=bias_init, input_shape=(time_steps, in_shape)))
 model.add(Dense(units=num_classes, bias_initializer=bias_init))
 model.add(Activation(activation=activation))
 # model.compile(loss=loss_function, optimizer=optimizer, metrics=metrics)
 model.summary()
 bal_accuracy = train_model(x_train, y_train, validation_split, epoch_train, mini_batch_size,
                            callbacks, x_test, y_test, model, n_folds, learning_rate)
-
 print "bal_accuracy: ", bal_accuracy
 balanced_accuracy = mean(bal_accuracy[:])
+
+
+# unit = 1000
+# n_layers = 1
+# type = 'Bidirectional'
+# model = Sequential()
+# model.add(Bidirectional(LSTM(units=unit, bias_initializer=bias_init), input_shape=(time_steps, in_shape), merge_mode=merge_mode))
+# model.add(Dense(units=num_classes, bias_initializer=bias_init))
+# model.add(Activation(activation=activation))
+# # model.compile(loss=loss_function, optimizer=optimizer, metrics=metrics)
+# model.summary()
+# bal_accuracy = train_model(x_train, y_train, validation_split, epoch_train, mini_batch_size,
+#                            callbacks, x_test, y_test, model, n_folds, learning_rate)
+# print "bal_accuracy: ", bal_accuracy
+# balanced_accuracy = mean(bal_accuracy[:])
 
 # unit = 500
 # n_layers = 5

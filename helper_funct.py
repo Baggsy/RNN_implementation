@@ -14,15 +14,23 @@ class EarlyStoppingByLossVal(Callback):
 
     def on_epoch_end(self, epoch, logs={}):
         current = logs.get(self.monitor)
-        counter = 0
+        if epoch == 1:
+            counter = 0
+
         if current is None:
             warnings.warn("Early stopping requires %s available!" % self.monitor, RuntimeWarning)
         else:
-            if logs.get('acc') < 0.05 or logs.get('loss') > 5:
-                counter += 1
-            if current < self.value or counter > 20:
-                if self.verbose > 0:
-                    print "Acc: ", logs.get('acc'), " Loss: ", logs.get('loss')
+            if not (counter is None):
+                if logs.get('acc') < 0.05 or logs.get('loss') > 5:
+                    counter += 1
+                if current < self.value or counter > 20:
+                    if self.verbose > 0:
+                        print "Acc: ", logs.get('acc'), " Loss: ", logs.get('loss')
+                    self.model.stop_training = True
+            else:
+                if current < self.value:
+                    if self.verbose > 0:
+                        print "Acc: ", logs.get('acc'), " Loss: ", logs.get('loss')
                 self.model.stop_training = True
 
 
