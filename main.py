@@ -112,11 +112,11 @@ unit = 500
 n_layers = 2
 type = 'LSTM'
 model = Sequential()
-model.add(LSTM(units=unit, return_sequences=True, bias_initializer=bias_init, input_shape=(time_steps, in_shape)))
-model.add(LSTM(units=unit, return_sequences=True, bias_initializer=bias_init))
+model.add(LSTM(units=unit, return_sequences=True, input_shape=(time_steps, in_shape)))
+model.add(LSTM(units=unit, return_sequences=True))
 # model.add(LSTM(units=unit, return_sequences=True, bias_initializer=bias_init))
 # model.add(LSTM(units=unit, return_sequences=True, bias_initializer=bias_init))
-model.add(LSTM(units=unit, bias_initializer=bias_init))
+model.add(LSTM(units=unit))
 model.add(Dense(units=num_classes, bias_initializer=bias_init))
 model.add(Activation(activation=activation))
 # model.compile(loss=loss_function, optimizer=optimizer, metrics=metrics)
