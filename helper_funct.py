@@ -7,7 +7,7 @@ import csv
 
 class EarlyStoppingByLossVal(Callback):
 
-    def __init__(self, monitor='acc', value=0.95, verbose=1):
+    def __init__(self, monitor='acc', value=0.99, verbose=1):
         super(Callback, self).__init__()
         self.monitor = monitor
         self.value = value
