@@ -68,19 +68,19 @@ start_time = time.time()
 # ______________________________________________________
 
 
-unit = 500
-n_layers = 1
-type = 'Bidirectional'
-model = Sequential()
-model.add(Bidirectional(LSTM(units=unit, bias_initializer=bias_init), input_shape=(time_steps, in_shape), merge_mode=merge_mode))
-model.add(Dense(units=num_classes, bias_initializer=bias_init))
-model.add(Activation(activation=activation))
-# model.compile(loss=loss_function, optimizer=optimizer, metrics=metrics)
-model.summary()
-bal_accuracy = train_model(x_train, y_train, validation_split, epoch_train, mini_batch_size,
-                           callbacks, x_test, y_test, model, n_folds, learning_rate)
-print "bal_accuracy: ", bal_accuracy
-balanced_accuracy = mean(bal_accuracy[:])
+# unit = 500
+# n_layers = 1
+# type = 'Bidirectional'
+# model = Sequential()
+# model.add(Bidirectional(LSTM(units=unit, bias_initializer=bias_init), input_shape=(time_steps, in_shape), merge_mode=merge_mode))
+# model.add(Dense(units=num_classes, bias_initializer=bias_init))
+# model.add(Activation(activation=activation))
+# # model.compile(loss=loss_function, optimizer=optimizer, metrics=metrics)
+# model.summary()
+# bal_accuracy = train_model(x_train, y_train, validation_split, epoch_train, mini_batch_size,
+#                            callbacks, x_test, y_test, model, n_folds, learning_rate)
+# print "bal_accuracy: ", bal_accuracy
+# balanced_accuracy = mean(bal_accuracy[:])
 
 
 # ______________________________________________________
@@ -162,51 +162,51 @@ balanced_accuracy = mean(bal_accuracy[:])
 
 
 #
-# for unit in units:
-#     for n_layers in layers:
-#         for type in lstm_type:
-#             print "unit: ", unit
-#             print "n_layers: ", n_layers
-#             print "type: ", type
-#             start_time2 = time.time()
-#             model = Sequential()
-#             # Adding the LSTM layers or the Bidirectional LSTM modules
-#             if type == 'LSTM':
-#                 if n_layers > 1:
-#                     model.add(LSTM(units=unit, input_shape=(time_steps, in_shape), return_sequences=True, bias_initializer=bias_init))
-#                     for j in range(1, n_layers-1):
-#                         model.add(LSTM(units=unit, return_sequences=True, bias_initializer=bias_init))
-#                     model.add(LSTM(units=unit, bias_initializer=bias_init))
-#                 else:
-#                     model.add(LSTM(units=unit, input_shape=(time_steps, in_shape), bias_initializer=bias_init))
-#             else:
-#                 if n_layers > 1:
-#                     model.add(Bidirectional(LSTM(units=unit, return_sequences=True, bias_initializer=bias_init), input_shape=(time_steps, in_shape), merge_mode=merge_mode))
-#                     for j in range(1, n_layers-1):
-#                         model.add(Bidirectional(LSTM(units=unit, return_sequences=True, bias_initializer=bias_init), merge_mode=merge_mode))
-#                     model.add(Bidirectional(LSTM(units=unit, bias_initializer=bias_init), merge_mode=merge_mode))
-#                 else:
-#                     model.add(Bidirectional(LSTM(units=unit, bias_initializer=bias_init), input_shape=(time_steps, in_shape), merge_mode=merge_mode))
-#
-#             # Adding the rest of the network's components
-#             model.add(Dense(units=num_classes, bias_initializer=bias_init))
-#             model.add(Activation(activation=activation))
-#             # model.compile(loss=loss_function, optimizer=optimizer, metrics=metrics)
-#             model.summary()
-#
-#             # training of the model
-#             bal_accuracy = train_model(x_train, y_train, validation_split, epoch_train, mini_batch_size,
-#                                        callbacks, x_test, y_test, model, n_folds, learning_rate)
-#
-#             model.reset_states()
-#             model.set_weights([ones(w.shape)*0.5 for w in model.get_weights()])
-#             del model
-#
-#             # Saving the balanced accuracy over the 4 folds
-#             balanced_accuracy[units.index(unit), layers.index(n_layers), lstm_type.index(type)] = bal_accuracy.mean()
-#
-#             run_time2 = time.time() - start_time2
-#             print "run time of units ", unit, " n_layers ", n_layers, " of type ", type, ": ", run_time2
+for unit in units:
+    for n_layers in layers:
+        for type in lstm_type:
+            print "unit: ", unit
+            print "n_layers: ", n_layers
+            print "type: ", type
+            start_time2 = time.time()
+            model = Sequential()
+            # Adding the LSTM layers or the Bidirectional LSTM modules
+            if type == 'LSTM':
+                if n_layers > 1:
+                    model.add(LSTM(units=unit, input_shape=(time_steps, in_shape), return_sequences=True, bias_initializer=bias_init))
+                    for j in range(1, n_layers-1):
+                        model.add(LSTM(units=unit, return_sequences=True, bias_initializer=bias_init))
+                    model.add(LSTM(units=unit, bias_initializer=bias_init))
+                else:
+                    model.add(LSTM(units=unit, input_shape=(time_steps, in_shape), bias_initializer=bias_init))
+            else:
+                if n_layers > 1:
+                    model.add(Bidirectional(LSTM(units=unit, return_sequences=True, bias_initializer=bias_init), input_shape=(time_steps, in_shape), merge_mode=merge_mode))
+                    for j in range(1, n_layers-1):
+                        model.add(Bidirectional(LSTM(units=unit, return_sequences=True, bias_initializer=bias_init), merge_mode=merge_mode))
+                    model.add(Bidirectional(LSTM(units=unit, bias_initializer=bias_init), merge_mode=merge_mode))
+                else:
+                    model.add(Bidirectional(LSTM(units=unit, bias_initializer=bias_init), input_shape=(time_steps, in_shape), merge_mode=merge_mode))
+
+            # Adding the rest of the network's components
+            model.add(Dense(units=num_classes, bias_initializer=bias_init))
+            model.add(Activation(activation=activation))
+            # model.compile(loss=loss_function, optimizer=optimizer, metrics=metrics)
+            model.summary()
+
+            # training of the model
+            bal_accuracy = train_model(x_train, y_train, validation_split, epoch_train, mini_batch_size,
+                                       callbacks, x_test, y_test, model, n_folds, learning_rate)
+
+            model.reset_states()
+            model.set_weights([ones(w.shape)*0.5 for w in model.get_weights()])
+            del model
+
+            # Saving the balanced accuracy over the 4 folds
+            balanced_accuracy[units.index(unit), layers.index(n_layers), lstm_type.index(type)] = bal_accuracy.mean()
+
+            run_time2 = time.time() - start_time2
+            print "run time of units ", unit, " n_layers ", n_layers, " of type ", type, ": ", run_time2
 
 run_time = time.time() - start_time
 print "balanced_accuracy: "

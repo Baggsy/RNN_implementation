@@ -18,7 +18,7 @@ class EarlyStoppingByLossVal(Callback):
         if current is None:
             warnings.warn("Early stopping requires %s available!" % self.monitor, RuntimeWarning)
         else:
-            if (current > self.value and logs.get('loss') < 0.01) or logs.get('acc') < 0.05:
+            if (current > self.value and logs.get('loss') < 0.001) or logs.get('acc') < 0.05:
                 if self.verbose > 0:
                     print "Acc: ", logs.get('acc'), " Loss: ", logs.get('loss')
                 self.model.stop_training = True
@@ -85,27 +85,27 @@ def train_model(x_train, y_train, validation_split, epoch_train, mini_batch_size
     model3 = clone_model(model)
     model4 = clone_model(model)
     model1.compile(loss='binary_crossentropy', optimizer=RMSprop(lr=learning_rate), metrics=['accuracy'])
-    model2.compile(loss='binary_crossentropy', optimizer=RMSprop(lr=learning_rate), metrics=['accuracy'])
-    model3.compile(loss='binary_crossentropy', optimizer=RMSprop(lr=learning_rate), metrics=['accuracy'])
-    model4.compile(loss='binary_crossentropy', optimizer=RMSprop(lr=learning_rate), metrics=['accuracy'])
+    # model2.compile(loss='binary_crossentropy', optimizer=RMSprop(lr=learning_rate), metrics=['accuracy'])
+    # model3.compile(loss='binary_crossentropy', optimizer=RMSprop(lr=learning_rate), metrics=['accuracy'])
+    # model4.compile(loss='binary_crossentropy', optimizer=RMSprop(lr=learning_rate), metrics=['accuracy'])
 
-    history1 = model1.fit(x_train[0], y_train[0], epochs=epoch_train, batch_size=mini_batch_size, callbacks=callbacks)
-    history2 = model2.fit(x_train[1], y_train[1], epochs=epoch_train, batch_size=mini_batch_size, callbacks=callbacks)
-    history3 = model3.fit(x_train[2], y_train[2], epochs=epoch_train, batch_size=mini_batch_size, callbacks=callbacks)
-    history4 = model4.fit(x_train[3], y_train[3], epochs=epoch_train, batch_size=mini_batch_size, callbacks=callbacks)
+    history1 = model1.fit(x_train[0], y_train[0], epochs=1, batch_size=mini_batch_size, callbacks=callbacks)
+    # history2 = model2.fit(x_train[1], y_train[1], epochs=epoch_train, batch_size=mini_batch_size, callbacks=callbacks)
+    # history3 = model3.fit(x_train[2], y_train[2], epochs=epoch_train, batch_size=mini_batch_size, callbacks=callbacks)
+    # history4 = model4.fit(x_train[3], y_train[3], epochs=epoch_train, batch_size=mini_batch_size, callbacks=callbacks)
 
     plot_hist(history1, 1)
-    plot_hist(history2, 2)
-    plot_hist(history3, 3)
-    plot_hist(history4, 4)
+    # plot_hist(history2, 2)
+    # plot_hist(history3, 3)
+    # plot_hist(history4, 4)
 
     # Predicting the test data labels
     predicted_labels[0] = model1.predict(x_test[0])
-    predicted_labels[1] = model2.predict(x_test[1])
-    predicted_labels[2] = model3.predict(x_test[2])
-    predicted_labels[3] = model4.predict(x_test[3])
+    # predicted_labels[1] = model2.predict(x_test[1])
+    # predicted_labels[2] = model3.predict(x_test[2])
+    # predicted_labels[3] = model4.predict(x_test[3])
 
-    for i in range(0, n_folds):
+    for i in range(0, 1):#n_folds):
         a = np.array([predicted_labels[i][:, 0]]).transpose()
         b = np.array([predicted_labels[i][:, 1]]).transpose()
         a = np.array(a >= b).astype(int)
