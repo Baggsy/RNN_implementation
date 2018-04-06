@@ -68,19 +68,19 @@ start_time = time.time()
 # ______________________________________________________
 
 
-# unit = 1000
-# n_layers = 1
-# type = 'Bidirectional'
-# model = Sequential()
-# model.add(Bidirectional(LSTM(units=unit, bias_initializer=bias_init), input_shape=(time_steps, in_shape), merge_mode=merge_mode))
-# model.add(Dense(units=num_classes, bias_initializer=bias_init))
-# model.add(Activation(activation=activation))
-# # model.compile(loss=loss_function, optimizer=optimizer, metrics=metrics)
-# model.summary()
-# bal_accuracy = train_model(x_train, y_train, validation_split, epoch_train, mini_batch_size,
-#                            callbacks, x_test, y_test, model, n_folds, learning_rate)
-# print "bal_accuracy: ", bal_accuracy
-# balanced_accuracy = mean(bal_accuracy[:])
+unit = 500
+n_layers = 1
+type = 'Bidirectional'
+model = Sequential()
+model.add(Bidirectional(LSTM(units=unit, bias_initializer=bias_init), input_shape=(time_steps, in_shape), merge_mode=merge_mode))
+model.add(Dense(units=num_classes, bias_initializer=bias_init))
+model.add(Activation(activation=activation))
+# model.compile(loss=loss_function, optimizer=optimizer, metrics=metrics)
+model.summary()
+bal_accuracy = train_model(x_train, y_train, validation_split, epoch_train, mini_batch_size,
+                           callbacks, x_test, y_test, model, n_folds, learning_rate)
+print "bal_accuracy: ", bal_accuracy
+balanced_accuracy = mean(bal_accuracy[:])
 
 
 # ______________________________________________________
@@ -132,30 +132,30 @@ start_time = time.time()
 
 # ______________________________________________________
 
-
-unit = 500
-n_layers = 10
-type = 'LSTM'
-model = Sequential()
-model.add(LSTM(units=unit, return_sequences=True, input_shape=(time_steps, in_shape)))
-model.add(LSTM(units=unit, return_sequences=True))
-model.add(LSTM(units=unit, return_sequences=True))
-model.add(LSTM(units=unit, return_sequences=True))
-model.add(LSTM(units=unit, return_sequences=True))
-model.add(LSTM(units=unit, return_sequences=True))
-model.add(LSTM(units=unit, return_sequences=True))
-model.add(LSTM(units=unit, return_sequences=True))
-model.add(LSTM(units=unit, return_sequences=True))
-model.add(LSTM(units=unit))
-model.add(Dense(units=num_classes))
-model.add(Activation(activation=activation))
-# model.compile(loss=loss_function, optimizer=optimizer, metrics=metrics)
-model.summary()
-bal_accuracy = train_model(x_train, y_train, validation_split, epoch_train, mini_batch_size,
-                           callbacks, x_test, y_test, model, n_folds, learning_rate)
-
-print "bal_accuracy: ", bal_accuracy
-balanced_accuracy = mean(bal_accuracy[:])
+#
+# unit = 500
+# n_layers = 10
+# type = 'LSTM'
+# model = Sequential()
+# model.add(LSTM(units=unit, return_sequences=True, input_shape=(time_steps, in_shape)))
+# model.add(LSTM(units=unit, return_sequences=True))
+# model.add(LSTM(units=unit, return_sequences=True))
+# model.add(LSTM(units=unit, return_sequences=True))
+# model.add(LSTM(units=unit, return_sequences=True))
+# model.add(LSTM(units=unit, return_sequences=True))
+# model.add(LSTM(units=unit, return_sequences=True))
+# model.add(LSTM(units=unit, return_sequences=True))
+# model.add(LSTM(units=unit, return_sequences=True))
+# model.add(LSTM(units=unit))
+# model.add(Dense(units=num_classes))
+# model.add(Activation(activation=activation))
+# # model.compile(loss=loss_function, optimizer=optimizer, metrics=metrics)
+# model.summary()
+# bal_accuracy = train_model(x_train, y_train, validation_split, epoch_train, mini_batch_size,
+#                            callbacks, x_test, y_test, model, n_folds, learning_rate)
+#
+# print "bal_accuracy: ", bal_accuracy
+# balanced_accuracy = mean(bal_accuracy[:])
 
 
 # ______________________________________________________
