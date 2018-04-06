@@ -18,7 +18,7 @@ class EarlyStoppingByLossVal(Callback):
         if current is None:
             warnings.warn("Early stopping requires %s available!" % self.monitor, RuntimeWarning)
         else:
-            if current > self.value or logs.get('acc') < 0.05:
+            if (current > self.value and logs.get('loss') < 0.01) or logs.get('acc') < 0.05:
                 if self.verbose > 0:
                     print "Acc: ", logs.get('acc'), " Loss: ", logs.get('loss')
                 self.model.stop_training = True
