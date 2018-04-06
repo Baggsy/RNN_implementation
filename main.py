@@ -25,6 +25,11 @@ activation = 'softmax'
 loss_function = 'binary_crossentropy'
 merge_mode = 'concat'
 
+
+units = [500]
+layers = [5]
+lstm_type = ['Bidirectional']
+
 # Data specific parameters
 n_sets = 8
 n_folds = 4
@@ -34,11 +39,13 @@ time_steps = 1
 # Defined callbacks. One for tensorboard and another for stopping the training at loss < 0.0005
 tbCallBack = keras.callbacks.TensorBoard(log_dir='./Graph', histogram_freq=0, write_graph=True, write_images=True)
 EarlyStopping = EarlyStoppingByLossVal(monitor='acc', value=0.99, verbose=1)
-callbacks = [EarlyStopping]
+EarlyStopping2 = keras.callbacks.EarlyStopping(monitor='loss', min_delta=0.001, patience=20, verbose=1, mode='min')
+callbacks = [EarlyStopping, EarlyStopping2]
 
 # initialing the output array
 bal_accuracy = np.zeros(n_folds)
 balanced_accuracy = np.zeros((len(units), len(layers), len(lstm_type)))
+run_time2 = np.zeros((len(units), len(layers), len(lstm_type)))
 
 # Reading the data from the read_data function
 x_train, x_test, y_train, y_test = read_data(n_folds)
@@ -173,20 +180,20 @@ for unit in units:
             # Adding the LSTM layers or the Bidirectional LSTM modules
             if type == 'LSTM':
                 if n_layers > 1:
-                    model.add(LSTM(units=unit, input_shape=(time_steps, in_shape), return_sequences=True, bias_initializer=bias_init))
+                    model.add(LSTM(units=unit, input_shape=(time_steps, in_shape), return_sequences=True))
                     for j in range(1, n_layers-1):
-                        model.add(LSTM(units=unit, return_sequences=True, bias_initializer=bias_init))
-                    model.add(LSTM(units=unit, bias_initializer=bias_init))
+                        model.add(LSTM(units=unit, return_sequences=True))
+                    model.add(LSTM(units=unit))
                 else:
-                    model.add(LSTM(units=unit, input_shape=(time_steps, in_shape), bias_initializer=bias_init))
+                    model.add(LSTM(units=unit, input_shape=(time_steps, in_shape)))
             else:
                 if n_layers > 1:
-                    model.add(Bidirectional(LSTM(units=unit, return_sequences=True, bias_initializer=bias_init), input_shape=(time_steps, in_shape), merge_mode=merge_mode))
+                    model.add(Bidirectional(LSTM(units=unit, return_sequences=True), input_shape=(time_steps, in_shape), merge_mode=merge_mode))
                     for j in range(1, n_layers-1):
-                        model.add(Bidirectional(LSTM(units=unit, return_sequences=True, bias_initializer=bias_init), merge_mode=merge_mode))
-                    model.add(Bidirectional(LSTM(units=unit, bias_initializer=bias_init), merge_mode=merge_mode))
+                        model.add(Bidirectional(LSTM(units=unit, return_sequences=True), merge_mode=merge_mode))
+                    model.add(Bidirectional(LSTM(units=unit), merge_mode=merge_mode))
                 else:
-                    model.add(Bidirectional(LSTM(units=unit, bias_initializer=bias_init), input_shape=(time_steps, in_shape), merge_mode=merge_mode))
+                    model.add(Bidirectional(LSTM(units=unit), input_shape=(time_steps, in_shape), merge_mode=merge_mode))
 
             # Adding the rest of the network's components
             model.add(Dense(units=num_classes, bias_initializer=bias_init))
@@ -204,13 +211,19 @@ for unit in units:
 
             # Saving the balanced accuracy over the 4 folds
             balanced_accuracy[units.index(unit), layers.index(n_layers), lstm_type.index(type)] = bal_accuracy.mean()
-
-            run_time2 = time.time() - start_time2
-            print "run time of units ", unit, " n_layers ", n_layers, " of type ", type, ": ", run_time2
+            print "average accuracy: ", balanced_accuracy[units.index(unit), layers.index(n_layers), lstm_type.index(type)]
+            run_time2[units.index(unit), layers.index(n_layers), lstm_type.index(type)] = time.time() - start_time2
+            print "run time of units ", unit, " n_layers ", n_layers, " of type ", type, ": ", run_time2[units.index(unit), layers.index(n_layers), lstm_type.index(type)]
 
 run_time = time.time() - start_time
+
+print ""
 print "balanced_accuracy: "
 print balanced_accuracy
+print "run_time2: "
+print run_time2
+print ""
+
 print "Total run time: ", run_time
 
 balanced_accuracy_final = balanced_accuracy.mean()
