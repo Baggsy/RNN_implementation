@@ -10,7 +10,7 @@ import time
 # HYPER Parameters
 mini_batch_size = 32
 embedding_size = 8
-learning_rate = 0.0005
+learning_rate = 0.001
 epoch_train = 300  # maximum repetitions
 validation_split = 0.05
 optimizer = RMSprop(lr=learning_rate)
