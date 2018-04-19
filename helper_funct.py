@@ -18,7 +18,7 @@ class EarlyStoppingByLossVal(Callback):
         if current is None:
             warnings.warn("Early stopping requires %s available!" % self.monitor, RuntimeWarning)
         else:
-            if (current > self.value and logs.get('loss') < 0.0001) or logs.get('acc') < 0.05:
+            if (current > self.value and logs.get('loss') < 0.0001) or (epoch > 50 and logs.get('acc') == 0):
                 if self.verbose > 0:
                     print "Acc: ", logs.get('acc'), " Loss: ", logs.get('loss')
                 self.model.stop_training = True
@@ -88,6 +88,8 @@ def train_model(x_train, y_train, validation_split, epoch_train, mini_batch_size
     model2.compile(loss='binary_crossentropy', optimizer=RMSprop(lr=learning_rate), metrics=['accuracy'])
     model3.compile(loss='binary_crossentropy', optimizer=RMSprop(lr=learning_rate), metrics=['accuracy'])
     model4.compile(loss='binary_crossentropy', optimizer=RMSprop(lr=learning_rate), metrics=['accuracy'])
+
+    epoch_train = 1
 
     history1 = model1.fit(x_train[0], y_train[0], epochs=epoch_train, batch_size=mini_batch_size, callbacks=callbacks)
     history2 = model2.fit(x_train[1], y_train[1], epochs=epoch_train, batch_size=mini_batch_size, callbacks=callbacks)
