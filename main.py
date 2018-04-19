@@ -8,14 +8,16 @@ import time
 
 
 # HYPER Parameters
-mini_batch_size = 32
+mini_batch_size = 1
 embedding_size = 8
-learning_rate = 0.001
+learning_rate =0.001
 epoch_train = 300  # maximum repetitions
 validation_split = 0.05
 optimizer = RMSprop(lr=learning_rate)
 metrics = ['accuracy']
 bias_init = 'he_normal'
+kernel_init = 'he_normal'
+weight_init = 'he_normal'
 
 # Model parameters
 units = [500, 1000]
@@ -26,9 +28,9 @@ loss_function = 'binary_crossentropy'
 merge_mode = 'concat'
 
 
-# units = [1000]
-# layers = [1]
-# lstm_type = ['LSTM']
+units = [500]
+layers = [5]
+lstm_type = ['LSTM']
 
 # Data specific parameters
 n_sets = 8
@@ -41,7 +43,7 @@ tbCallBack = keras.callbacks.TensorBoard(log_dir='./Graph', histogram_freq=0, wr
 EarlyStopping = EarlyStoppingByLossVal(monitor='acc', value=0.99, verbose=1)
 EarlyStopping2 = keras.callbacks.EarlyStopping(monitor='loss', min_delta=0.001, patience=20, verbose=1, mode='min')
 EarlyStopping3 = keras.callbacks.EarlyStopping(monitor='acc', min_delta=0, patience=15, verbose=1, mode='max')
-callbacks = [EarlyStoppi]
+callbacks = [EarlyStopping, tbCallBack]
 
 # initialing the output array
 bal_accuracy = np.zeros(n_folds)
@@ -54,7 +56,7 @@ x_train, x_test, y_train, y_test = read_data(n_folds)
 # in_shape defines the input shape of the LSTM modules
 in_shape = len(x_train[0][0][0])  # data length variable for the input tensor
 start_time = time.time()
-
+print in_shape
 
 # ______________________________________________________
 
@@ -169,6 +171,8 @@ start_time = time.time()
 # ______________________________________________________
 
 
+
+
 #
 for unit in units:
     for n_layers in layers:
@@ -181,20 +185,20 @@ for unit in units:
             # Adding the LSTM layers or the Bidirectional LSTM modules
             if type == 'LSTM':
                 if n_layers > 1:
-                    model.add(LSTM(units=unit, input_shape=(time_steps, in_shape), return_sequences=True, bias_initializer=bias_init))
+                    model.add(LSTM(units=unit, input_shape=(time_steps, in_shape), return_sequences=True, bias_initializer=bias_init, kernel_initializer=kernel_init, recurrent_initializer=weight_init))
                     for j in range(1, n_layers-1):
-                        model.add(LSTM(units=unit, return_sequences=True, bias_initializer=bias_init))
-                    model.add(LSTM(units=unit, bias_initializer=bias_init))
+                        model.add(LSTM(units=unit, return_sequences=True, bias_initializer=bias_init, kernel_initializer=kernel_init, recurrent_initializer=weight_init))
+                    model.add(LSTM(units=unit, bias_initializer=bias_init, kernel_initializer=kernel_init, recurrent_initializer=weight_init))
                 else:
-                    model.add(LSTM(units=unit, input_shape=(time_steps, in_shape), bias_initializer=bias_init))
+                    model.add(LSTM(units=unit, input_shape=(time_steps, in_shape), bias_initializer=bias_init, kernel_initializer=kernel_init, recurrent_initializer=weight_init))
             else:
                 if n_layers > 1:
-                    model.add(Bidirectional(LSTM(units=unit, return_sequences=True, bias_initializer=bias_init), input_shape=(time_steps, in_shape), merge_mode=merge_mode))
+                    model.add(Bidirectional(LSTM(units=unit, return_sequences=True, bias_initializer=bias_init, kernel_initializer=kernel_init, recurrent_initializer=weight_init), input_shape=(time_steps, in_shape), merge_mode=merge_mode))
                     for j in range(1, n_layers-1):
-                        model.add(Bidirectional(LSTM(units=unit, return_sequences=True, bias_initializer=bias_init), merge_mode=merge_mode))
-                    model.add(Bidirectional(LSTM(units=unit, bias_initializer=bias_init), merge_mode=merge_mode))
+                        model.add(Bidirectional(LSTM(units=unit, return_sequences=True, bias_initializer=bias_init, kernel_initializer=kernel_init, recurrent_initializer=weight_init), merge_mode=merge_mode))
+                    model.add(Bidirectional(LSTM(units=unit, bias_initializer=bias_init, kernel_initializer=kernel_init, recurrent_initializer=weight_init), merge_mode=merge_mode))
                 else:
-                    model.add(Bidirectional(LSTM(units=unit, bias_initializer=bias_init), input_shape=(time_steps, in_shape), merge_mode=merge_mode))
+                    model.add(Bidirectional(LSTM(units=unit, bias_initializer=bias_init, kernel_initializer=kernel_init, recurrent_initializer=weight_init), input_shape=(time_steps, in_shape), merge_mode=merge_mode))
 
             # Adding the rest of the network's components
             model.add(Dense(units=num_classes))
