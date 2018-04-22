@@ -10,14 +10,15 @@ import time
 # HYPER Parameters
 mini_batch_size = 32
 embedding_size = 8
-learning_rate = 0.002  # 0.001
+learning_rate = 0.005 # 0.001
 epoch_train = 300  # maximum repetitions
 validation_split = 0.05
-optimizer = RMSprop(lr=learning_rate)
+optimizer = keras.optimizers.Adam(lr=learning_rate)  # RMSprop(lr=learning_rate)
 metrics = ['accuracy']
-bias_init = keras.initializers.Constant(value=0.5)  # 'he_normal'
-kernel_init = keras.initializers.Constant(value=0.5)  # 'he_normal'
-weight_init = keras.initializers.Constant(value=0.5)  # 'he_normal'
+bias_init = keras.initializers.RandomNormal(mean=0.0, stddev=0.15, seed=None)  # keras.initializers.Constant(value=0.5)  # 'he_normal'
+kernel_init = keras.initializers.RandomNormal(mean=0.0, stddev=0.15, seed=None)  # keras.initializers.Constant(value=0.5)  # 'he_normal'
+weight_init = keras.initializers.RandomNormal(mean=0.0, stddev=0.15, seed=None)  # keras.initializers.Constant(value=0.5)  # 'he_normal'
+
 
 # Model parameters
 units = [500, 1000]
@@ -60,124 +61,6 @@ start_time = time.time()
 
 # ______________________________________________________
 
-# unit = 500
-# n_layers = 1
-# type = 'LSTM'
-# model = Sequential()
-# model.add(LSTM(units=unit, bias_initializer=bias_init, input_shape=(time_steps, in_shape)))
-# model.add(Dense(units=num_classes, bias_initializer=bias_init))
-# model.add(Activation(activation=activation))
-# # model.compile(loss=loss_function, optimizer=optimizer, metrics=metrics)
-# model.summary()
-# bal_accuracy = train_model(x_train, y_train, validation_split, epoch_train, mini_batch_size,
-#                            callbacks, x_test, y_test, model, n_folds, learning_rate)
-# print "bal_accuracy: ", bal_accuracy
-# balanced_accuracy = mean(bal_accuracy[:])
-
-
-# ______________________________________________________
-
-
-# unit = 500
-# n_layers = 1
-# type = 'Bidirectional'
-# model = Sequential()
-# model.add(Bidirectional(LSTM(units=unit, bias_initializer=bias_init), input_shape=(time_steps, in_shape), merge_mode=merge_mode))
-# model.add(Dense(units=num_classes, bias_initializer=bias_init))
-# model.add(Activation(activation=activation))
-# # model.compile(loss=loss_function, optimizer=optimizer, metrics=metrics)
-# model.summary()
-# bal_accuracy = train_model(x_train, y_train, validation_split, epoch_train, mini_batch_size,
-#                            callbacks, x_test, y_test, model, n_folds, learning_rate)
-# print "bal_accuracy: ", bal_accuracy
-# balanced_accuracy = mean(bal_accuracy[:])
-
-
-# ______________________________________________________
-
-# unit = 500
-# n_layers = 5
-# type = 'Bidirectional'
-# model = Sequential()
-# model.add(Bidirectional(LSTM(units=unit, return_sequences=True, bias_initializer=bias_init), input_shape=(time_steps, in_shape), merge_mode=merge_mode))
-# model.add(Bidirectional(LSTM(units=unit, return_sequences=True, bias_initializer=bias_init), merge_mode=merge_mode))
-# model.add(Bidirectional(LSTM(units=unit, return_sequences=True, bias_initializer=bias_init), merge_mode=merge_mode))
-# model.add(Bidirectional(LSTM(units=unit, return_sequences=True, bias_initializer=bias_init), merge_mode=merge_mode))
-# model.add(Bidirectional(LSTM(units=unit, bias_initializer=bias_init), merge_mode=merge_mode))
-# model.add(Dense(units=num_classes, bias_initializer=bias_init))
-# model.add(Activation(activation=activation))
-# # model.compile(loss=loss_function, optimizer=optimizer, metrics=metrics)
-# model.summary()
-# bal_accuracy = train_model(x_train, y_train, validation_split, epoch_train, mini_batch_size,
-#                            callbacks, x_test, y_test, model, n_folds, learning_rate)
-#
-# print "bal_accuracy: ", bal_accuracy
-# balanced_accuracy = mean(bal_accuracy[:])
-
-#
-# # ______________________________________________________
-#
-#
-# unit = 1000
-# n_layers = 5
-# type = 'LSTM'
-# model = Sequential()
-# model.add(LSTM(units=unit, return_sequences=True, input_shape=(time_steps, in_shape)))
-# model.add(LSTM(units=unit, return_sequences=True))
-# model.add(LSTM(units=unit, return_sequences=True))
-# model.add(LSTM(units=unit, return_sequences=True))
-# model.add(LSTM(units=unit))
-# model.add(Dense(units=num_classes ))
-# model.add(Activation(activation=activation))
-# # model.compile(loss=loss_function, optimizer=optimizer, metrics=metrics)
-# model.summary()
-# bal_accuracy = train_model(x_train, y_train, validation_split, epoch_train, mini_batch_size,
-#                            callbacks, x_test, y_test, model, n_folds, learning_rate)
-#
-# print "bal_accuracy: ", bal_accuracy
-# balanced_accuracy = mean(bal_accuracy[:])
-
-
-
-
-# ______________________________________________________
-
-#
-# unit = 500
-# n_layers = 10
-# type = 'LSTM'
-# model = Sequential()
-# model.add(LSTM(units=unit, return_sequences=True, input_shape=(time_steps, in_shape)))
-# model.add(LSTM(units=unit, return_sequences=True))
-# model.add(LSTM(units=unit, return_sequences=True))
-# model.add(LSTM(units=unit, return_sequences=True))
-# model.add(LSTM(units=unit, return_sequences=True))
-# model.add(LSTM(units=unit, return_sequences=True))
-# model.add(LSTM(units=unit, return_sequences=True))
-# model.add(LSTM(units=unit, return_sequences=True))
-# model.add(LSTM(units=unit, return_sequences=True))
-# model.add(LSTM(units=unit))
-# model.add(Dense(units=num_classes))
-# model.add(Activation(activation=activation))
-# # model.compile(loss=loss_function, optimizer=optimizer, metrics=metrics)
-# model.summary()
-# bal_accuracy = train_model(x_train, y_train, validation_split, epoch_train, mini_batch_size,
-#                            callbacks, x_test, y_test, model, n_folds, learning_rate)
-#
-# print "bal_accuracy: ", bal_accuracy
-# balanced_accuracy = mean(bal_accuracy[:])
-
-
-# ______________________________________________________
-
-
-# LSTM(units, activation='tanh', recurrent_activation='hard_sigmoid', use_bias=True, kernel_initializer='glorot_uniform', 
-#             recurrent_initializer='orthogonal', bias_initializer='zeros', unit_forget_bias=True, kernel_regularizer=None, 
-#             recurrent_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, 
-#             recurrent_constraint=None, bias_constraint=None, dropout=0.0, recurrent_dropout=0.0, implementation=1, 
-#             return_sequences=False, return_state=False, go_backwards=False, stateful=False, unroll=False)
-
-#
 for unit in units:
     for n_layers in layers:
         for type in lstm_type:
