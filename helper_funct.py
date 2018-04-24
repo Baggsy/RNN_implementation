@@ -2,12 +2,13 @@ from pylab import *
 from tensorflow.python.keras.models import model_from_config
 from tensorflow.python.keras.optimizers import RMSprop
 from tensorflow.python.keras.callbacks import Callback
+from tensorflow import keras
 import csv
 
 
 class EarlyStoppingByLossVal(Callback):
 
-    def __init__(self, monitor='acc', value=0.99, verbose=1):
+    def __init__(self, monitor='loss', value=0.001, verbose=1):
         super(Callback, self).__init__()
         self.monitor = monitor
         self.value = value
@@ -18,10 +19,49 @@ class EarlyStoppingByLossVal(Callback):
         if current is None:
             warnings.warn("Early stopping requires %s available!" % self.monitor, RuntimeWarning)
         else:
-            if (current > self.value and logs.get('loss') < 0.0001) or (epoch > 50 and logs.get('acc') == 0):
+            if (current < self.value and logs.get('acc') > 0.95) or (epoch > 50 and logs.get('acc') == 0):
                 if self.verbose > 0:
-                    print "Acc: ", logs.get('acc'), " Loss: ", logs.get('loss')
+                    print "\n----- Stopping at Acc: ", logs.get('acc'), " Loss: ", logs.get('loss'), " -----\n"
                 self.model.stop_training = True
+
+
+class EarlyStoppingByLossVal2(Callback):
+
+    def __init__(self, monitor='acc', value=0.95, verbose=1):
+        super(Callback, self).__init__()
+        self.monitor = monitor
+        self.value = value
+        self.verbose = verbose
+
+    def on_epoch_end(self, epoch, logs={}):
+        current = logs.get(self.monitor)
+        if current is None:
+            warnings.warn("Early stopping requires %s available!" % self.monitor, RuntimeWarning)
+        else:
+            if current > self.value or logs.get('loss') < 0.1:
+                if self.verbose > 0:
+                    print "\n----- Stopping at Acc: ", logs.get('acc'), " Loss: ", logs.get('loss'), " -----\n"
+                self.model.stop_training = True
+
+
+class EarlyStoppingByLossVal3(Callback):
+
+    def __init__(self, monitor='loss', value=0.001, verbose=1):
+        super(Callback, self).__init__()
+        self.monitor = monitor
+        self.value = value
+        self.verbose = verbose
+
+    def on_epoch_end(self, epoch, logs={}):
+        current = logs.get(self.monitor)
+        if current is None:
+            warnings.warn("Early stopping requires %s available!" % self.monitor, RuntimeWarning)
+        else:
+            if current < self.value:
+                if self.verbose > 0:
+                    print "\n----- Stopping at Acc: ", logs.get('acc'), " Loss: ", logs.get('loss'), " -----\n"
+                self.model.stop_training = True
+
 
 
 def read_data(n_folds):
@@ -75,55 +115,81 @@ def clone_model(model, custom_objects={}):
     return clone
 
 
+def find_balanced_accuracy(predicted_labels, y_test):
+    a = np.array([predicted_labels[:, 0]]).transpose()
+    b = np.array([predicted_labels[:, 1]]).transpose()
+    a = np.array(a >= b).astype(int)
+    b = np.array(abs(a - 1))
+    y_pred = np.concatenate((a, b), axis=1)
+
+    # Calculating the balanced accuracy
+    TP = sum(((y_pred == [1, 0])[:, 0]) & (((y_pred == y_test).astype(int))[:, 0])) * 1.0
+    TN = sum(((y_pred == [0, 1])[:, 0]) & (((y_pred == y_test).astype(int))[:, 0])) * 1.0
+    P = sum(((y_test == [1, 0]).astype(int))[:, 0]) * 1.0
+    N = sum(((y_test == [0, 1]).astype(int))[:, 0]) * 1.0
+    bal_accuracy = (TP / P + TN / N) / 2.0
+    print("TP:", TP)
+    print("TN:", TN)
+    print("P:", P)
+    print("N:", N)
+    print "bal_accuracy: ", bal_accuracy
+
+    return bal_accuracy
+
+
 def train_model(x_train, y_train, validation_split, epoch_train, mini_batch_size,
-                callbacks, x_test, y_test, model, n_folds, learning_rate):
-    bal_accuracy = np.zeros(n_folds)
+                x_test, y_test, model, n_folds, learning_rate, optimizer, loss_function, metrics):
+
+    bal_accuracy = [[0 for _ in xrange(n_folds)] for _ in xrange(6)]
     predicted_labels = [0 for _ in xrange(n_folds)]
 
     model1 = clone_model(model)
     model2 = clone_model(model)
     model3 = clone_model(model)
     model4 = clone_model(model)
-    model1.compile(loss='binary_crossentropy', optimizer=RMSprop(lr=learning_rate), metrics=['accuracy'])
-    model2.compile(loss='binary_crossentropy', optimizer=RMSprop(lr=learning_rate), metrics=['accuracy'])
-    model3.compile(loss='binary_crossentropy', optimizer=RMSprop(lr=learning_rate), metrics=['accuracy'])
-    model4.compile(loss='binary_crossentropy', optimizer=RMSprop(lr=learning_rate), metrics=['accuracy'])
+    model1.compile(loss=loss_function, optimizer=optimizer, metrics=metrics)
+    model2.compile(loss=loss_function, optimizer=optimizer, metrics=metrics)
+    model3.compile(loss=loss_function, optimizer=optimizer, metrics=metrics)
+    model4.compile(loss=loss_function, optimizer=optimizer, metrics=metrics)
 
-    # epoch_train = 1
+    callback = [0 for _ in xrange(6)]\
 
-    history1 = model1.fit(x_train[0], y_train[0], epochs=epoch_train, batch_size=mini_batch_size, callbacks=callbacks)
-    history2 = model2.fit(x_train[1], y_train[1], epochs=epoch_train, batch_size=mini_batch_size, callbacks=callbacks)
-    history3 = model3.fit(x_train[2], y_train[2], epochs=epoch_train, batch_size=mini_batch_size, callbacks=callbacks)
-    history4 = model4.fit(x_train[3], y_train[3], epochs=epoch_train, batch_size=mini_batch_size, callbacks=callbacks)
+    tbCallBack = keras.callbacks.TensorBoard(log_dir='./Graph', histogram_freq=0, write_graph=True, write_images=True)
+    EarlyStopping = EarlyStoppingByLossVal(monitor='loss', value=0.05, verbose=1)
+    callback_basic = keras.callbacks.EarlyStopping(monitor='loss', min_delta=0.001, patience=20, verbose=1, mode='min')
 
-    plot_hist(history1, 1)
-    plot_hist(history2, 2)
-    plot_hist(history3, 3)
-    plot_hist(history4, 4)
+    callback[0] = [EarlyStoppingByLossVal2(monitor='acc', value=0.95, verbose=1)]
+    callback[1] = [EarlyStoppingByLossVal3(monitor='loss', value=0.1, verbose=1)]
+    callback[2] = [EarlyStoppingByLossVal3(monitor='loss', value=0.05, verbose=1)]
+    callback[3] = [EarlyStoppingByLossVal3(monitor='loss', value=0.01, verbose=1)]
+    callback[4] = [EarlyStoppingByLossVal3(monitor='loss', value=0.005, verbose=1)]
+    callback[5] = [EarlyStopping]
 
-    # Predicting the test data labels
-    predicted_labels[0] = model1.predict(x_test[0])
-    predicted_labels[1] = model2.predict(x_test[1])
-    predicted_labels[2] = model3.predict(x_test[2])
-    predicted_labels[3] = model4.predict(x_test[3])
+    for callb in callback:
+        history1 = model1.fit(x_train[0], y_train[0], epochs=epoch_train, batch_size=mini_batch_size, callbacks=callb, verbose=2)
+        history2 = model2.fit(x_train[1], y_train[1], epochs=epoch_train, batch_size=mini_batch_size, callbacks=callb, verbose=2)
+        history3 = model3.fit(x_train[2], y_train[2], epochs=epoch_train, batch_size=mini_batch_size, callbacks=callb, verbose=2)
+        history4 = model4.fit(x_train[3], y_train[3], epochs=epoch_train, batch_size=mini_batch_size, callbacks=callb, verbose=2)
 
-    for i in range(0, n_folds):
-        a = np.array([predicted_labels[i][:, 0]]).transpose()
-        b = np.array([predicted_labels[i][:, 1]]).transpose()
-        a = np.array(a >= b).astype(int)
-        b = np.array(abs(a-1))
-        y_pred = np.concatenate((a, b), axis=1)
+        plot_hist(history1, 1)
+        plot_hist(history2, 2)
+        plot_hist(history3, 3)
+        plot_hist(history4, 4)
 
-        # Calculating the balanced accuracy
-        TP = sum(((y_pred == [1, 0])[:, 0]) & (((y_pred == y_test[i]).astype(int))[:, 0]))*1.0
-        TN = sum(((y_pred == [0, 1])[:, 0]) & (((y_pred == y_test[i]).astype(int))[:, 0]))*1.0
-        P = sum(((y_test[i] == [1, 0]).astype(int))[:, 0])*1.0
-        N = sum(((y_test[i] == [0, 1]).astype(int))[:, 0])*1.0
-        bal_accuracy[i] = (TP/P + TN/N)/2.0
-        print("TP:", TP)
-        print("TN:", TN)
-        print("P:", P)
-        print("N:", N)
-        print "bal_accuracy[i]: ", bal_accuracy[i]
+        # Predicting the test data labels
+        predicted_labels[0] = model1.predict(x_test[0])
+        predicted_labels[1] = model2.predict(x_test[1])
+        predicted_labels[2] = model3.predict(x_test[2])
+        predicted_labels[3] = model4.predict(x_test[3])
 
-    return bal_accuracy
+        for i in range(0, n_folds):
+            bal_accuracy[callback.index(callb)][i] = find_balanced_accuracy(predicted_labels[i], y_test[i])
+            # print "bal_accuracy[{}]: {}".format(i, bal_accuracy[i])
+
+    print "\nbal_accuracy: ", bal_accuracy, "\n"
+    temp = np.mean(bal_accuracy, axis=1)
+    index = temp.argmax()
+    balanced_accuracy = bal_accuracy[index]
+    print "balanced_accuracy: ", balanced_accuracy
+
+    return balanced_accuracy
