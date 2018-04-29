@@ -7,8 +7,10 @@ n_folds = 4
 x = [[] for _ in xrange(n_sets)]
 y = [[] for _ in xrange(n_sets)]
 x_train = [[] for _ in xrange(n_folds)]
+x_val = [[] for _ in xrange(n_folds)]
 x_test = [[] for _ in xrange(n_folds)]
 y_train = [[] for _ in xrange(n_folds)]
+y_val = [[] for _ in xrange(n_folds)]
 y_test = [[] for _ in xrange(n_folds)]
 
 # Naming convention of the files

@@ -38,7 +38,7 @@ merge_mode = 'average' # 'concat'
 
 
 units = [100]
-layers = [1]
+layers = [11]
 lstm_type = ['LSTM']
 
 file = open("results.txt", "a")
@@ -120,29 +120,38 @@ for unit in units:
             #     else:
             #         model.add(Bidirectional(LSTM(units=unit, bias_initializer=bias_init, kernel_initializer=kernel_init, recurrent_initializer=weight_init, use_Bias=use_bias), input_shape=(time_steps, in_shape), merge_mode=merge_mode))
 
+            models_recovering = [Sequential() for _ in xrange(n_folds)]
             i = n_layers - 1
+            layers_to_load = 0
             isloaded = False
             while i > 0 and not isloaded:
-                file_name = "Weights_layers:{}_Type:{}_units:{}_finalLayerSize:{}.h5".format(i, lstm_type, units, n_layers)
+                file_name = "Models_layers:{}_Type:{}_units:{}_Set:0.h5".format(i, type, unit)
                 if os.path.isfile(file_name):
-                    model.load_weights(file_name, by_name=True)
+                    print "loading: {}".format(file_name)
+                    # for k in xrange(n_folds):
+                    #     models_recovering[k].load_weights("Model_layers:{}_Type:{}_units:{}_Set:{}.h5".format(i, lstm_type, units, k), by_name=True)
                     isloaded = True
+                    layers_to_load = i
                 i -= 1
 
             if isloaded:
                 for layer in model.layers[:i+1]:
                     layer.trainable = False
 
+            for layer in model.layers:
+                print(layer, layer.trainable)
+                print(layer.name)
+
             # Adding the rest of the network's components
             model.add(Dense(units=num_classes))
             model.add(Activation(activation=activation))
-            # model.compile(loss=loss_function, optimizer=optimizer, metrics=metrics)
+            model.compile(loss=loss_function, optimizer=optimizer, metrics=metrics)
             model.summary()
 
             # training of the model
             bal_accuracy = train_model(x_train, y_train, validation_split, epoch_train, mini_batch_size,
-                                       x_test, y_test, model, n_folds, learning_rate, optimizer,
-                                       loss_function, metrics)
+                                            x_test, y_test, model, n_folds, learning_rate, optimizer,
+                                            loss_function, metrics, isloaded, n_layers, layers_to_load, type, unit)
 
             # Saving the balanced accuracy over the 4 folds
             balanced_accuracy[units.index(unit), layers.index(n_layers), lstm_type.index(type)] = bal_accuracy
@@ -152,7 +161,7 @@ for unit in units:
             file.write(" units: {} n_layers: {} type: {} balanced accuracy: {}".format(unit, n_layers, type, bal_accuracy))
 
             # model.save("Model_layers:{}_Type:{}_units:{}_finalLayerSize:{}.h5".format(n_layers,lstm_type,units, n_layers))
-            model.save_weights("Weights_layers:{}_Type:{}_units:{}_finalLayerSize:{}.h5".format(n_layers,lstm_type,units, n_layers))
+
             del model
 
 
@@ -224,22 +233,22 @@ for unit in units:
 #
 #             model.save("Model_layers:{}_Type:{}_units:{}_finalLayerSize:{}.h5".format(i,lstm_type,units, n_layers))
 #             model.save_weights("Weights_layers:{}_Type:{}_units:{}_finalLayerSize:{}.h5".format(i,lstm_type,units, n_layers))
-#
-# run_time = time.time() - start_time
-#
+
+run_time = time.time() - start_time
+
+print ""
+print "balanced_accuracy: "
+print balanced_accuracy
+print "run_time2: "
+print run_time2
 # print ""
-# print "balanced_accuracy: "
-# print balanced_accuracy
-# print "run_time2: "
-# print run_time2
-# # print ""
-#
-# print "Total run time: ", run_time
-#
-# balanced_accuracy_final = balanced_accuracy.mean()
-#
-# print("")
-# print "Successfully trained and run with balanced_accuracy_final: ", balanced_accuracy_final
+
+print "Total run time: ", run_time
+
+balanced_accuracy_final = balanced_accuracy.mean()
+
+print("")
+print "Successfully trained and run with balanced_accuracy_final: ", balanced_accuracy_final
 
 file.write("time: {}\n\n".format(run_time))
 file.close()

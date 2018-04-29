@@ -105,13 +105,17 @@ def plot_hist(history, i):
     savefig('loss_function_' + str(i) + 'fold.png')
 
 
-def clone_model(model, custom_objects={}):
+def clone_model(model, isloaded, layers_to_load, lstm_type, unit, set, custom_objects={}):
     config = {
         'class_name': model.__class__.__name__,
         'config': model.get_config(),
     }
     clone = model_from_config(config, custom_objects=custom_objects)
-    # clone.set_weights(model.get_weights())
+    if isloaded:
+        print "cloning weights:"
+        clone.load_weights("Models_layers:{}_Type:{}_units:{}_Set:{}.h5".format(layers_to_load, lstm_type, unit, set), by_name=True)
+        # clone.set_weights(model_recovering.get_weights())
+
     return clone
 
 
@@ -138,24 +142,26 @@ def find_balanced_accuracy(predicted_labels, y_test):
 
 
 def train_model(x_train, y_train, validation_split, epoch_train, mini_batch_size,
-                x_test, y_test, model, n_folds, learning_rate, optimizer, loss_function, metrics):
+                x_test, y_test, model, n_folds, learning_rate, optimizer,
+                loss_function, metrics, isloaded, n_layers, layers_to_load, type, unit):
 
     bal_accuracy = [[0 for _ in xrange(n_folds)] for _ in xrange(6)]
+    models = [[0 for _ in xrange(n_folds)] for _ in xrange(6)]
     predicted_labels = [0 for _ in xrange(n_folds)]
 
-    model1 = clone_model(model)
-    model2 = clone_model(model)
-    model3 = clone_model(model)
-    model4 = clone_model(model)
+    model1 = clone_model(model, isloaded, layers_to_load, type, unit, 0)
+    model2 = clone_model(model, isloaded, layers_to_load, type, unit, 1)
+    model3 = clone_model(model, isloaded, layers_to_load, type, unit, 2)
+    model4 = clone_model(model, isloaded, layers_to_load, type, unit, 3)
     model1.compile(loss=loss_function, optimizer=optimizer, metrics=metrics)
     model2.compile(loss=loss_function, optimizer=optimizer, metrics=metrics)
     model3.compile(loss=loss_function, optimizer=optimizer, metrics=metrics)
     model4.compile(loss=loss_function, optimizer=optimizer, metrics=metrics)
 
-    callback = [0 for _ in xrange(6)]\
+    callback = [0 for _ in xrange(6)]
 
     tbCallBack = keras.callbacks.TensorBoard(log_dir='./Graph', histogram_freq=0, write_graph=True, write_images=True)
-    EarlyStopping = EarlyStoppingByLossVal(monitor='loss', value=0.05, verbose=1)
+    EarlyStopping = EarlyStoppingByLossVal(monitor='loss', value=0.001, verbose=1)
     callback_basic = keras.callbacks.EarlyStopping(monitor='loss', min_delta=0.001, patience=20, verbose=1, mode='min')
 
     callback[0] = [EarlyStoppingByLossVal2(monitor='acc', value=0.95, verbose=1)]
@@ -166,15 +172,23 @@ def train_model(x_train, y_train, validation_split, epoch_train, mini_batch_size
     callback[5] = [EarlyStopping]
 
     for callb in callback:
-        history1 = model1.fit(x_train[0], y_train[0], epochs=epoch_train, batch_size=mini_batch_size, callbacks=callb, verbose=2)
-        history2 = model2.fit(x_train[1], y_train[1], epochs=epoch_train, batch_size=mini_batch_size, callbacks=callb, verbose=2)
-        history3 = model3.fit(x_train[2], y_train[2], epochs=epoch_train, batch_size=mini_batch_size, callbacks=callb, verbose=2)
-        history4 = model4.fit(x_train[3], y_train[3], epochs=epoch_train, batch_size=mini_batch_size, callbacks=callb, verbose=2)
+        model1.fit(x_train[0], y_train[0], epochs=epoch_train, batch_size=mini_batch_size, callbacks=callb, verbose=2)
+        model2.fit(x_train[1], y_train[1], epochs=epoch_train, batch_size=mini_batch_size, callbacks=callb, verbose=2)
+        model3.fit(x_train[2], y_train[2], epochs=epoch_train, batch_size=mini_batch_size, callbacks=callb, verbose=2)
+        model4.fit(x_train[3], y_train[3], epochs=epoch_train, batch_size=mini_batch_size, callbacks=callb, verbose=2)
+        models[callback.index(callb)][0] = model1
+        models[callback.index(callb)][0].set_weights(model1.get_weights())
+        models[callback.index(callb)][1] = model2
+        models[callback.index(callb)][1].set_weights(model2.get_weights())
+        models[callback.index(callb)][2] = model3
+        models[callback.index(callb)][2].set_weights(model3.get_weights())
+        models[callback.index(callb)][3] = model4
+        models[callback.index(callb)][3].set_weights(model4.get_weights())
 
-        plot_hist(history1, 1)
-        plot_hist(history2, 2)
-        plot_hist(history3, 3)
-        plot_hist(history4, 4)
+        # plot_hist(history1, 1)
+        # plot_hist(history2, 2)
+        # plot_hist(history3, 3)
+        # plot_hist(history4, 4)
 
         # Predicting the test data labels
         predicted_labels[0] = model1.predict(x_test[0])
@@ -190,6 +204,10 @@ def train_model(x_train, y_train, validation_split, epoch_train, mini_batch_size
     temp = np.mean(bal_accuracy, axis=1)
     index = temp.argmax()
     balanced_accuracy = bal_accuracy[index]
+    models_to_save = models[index]
+    for model2 in models_to_save:
+        model2.save("Models_layers:{}_Type:{}_units:{}_Set:{}.h5".format(n_layers, type, unit,
+                                                                        models_to_save.index(model2)))
     print "balanced_accuracy: ", balanced_accuracy
 
     return balanced_accuracy
