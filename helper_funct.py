@@ -69,10 +69,13 @@ def read_data(n_folds):
     x_test = [[] for _ in xrange(n_folds)]
     y_train = [[] for _ in xrange(n_folds)]
     y_test = [[] for _ in xrange(n_folds)]
+    x_val = [[] for _ in xrange(n_folds)]
+    y_val = [[] for _ in xrange(n_folds)]
 
     # Naming convention of the files
     start_train = "_train["
     start_test = "_test["
+    start_val = "_val["
     file_type_end = "].csv"
 
     path = "data/"
@@ -81,17 +84,22 @@ def read_data(n_folds):
         csv_y_train = path + "y" + start_train + str(i) + file_type_end
         csv_x_test = path + "x" + start_test + str(i) + file_type_end
         csv_y_test = path + "y" + start_test + str(i) + file_type_end
+        csv_x_val = path + "x" + start_val + str(i) + file_type_end
+        csv_y_val = path + "y" + start_val + str(i) + file_type_end
 
         x_train[i] = np.array(list(csv.reader(open(csv_x_train))))
         y_train[i] = np.array(list(csv.reader(open(csv_y_train)))).astype(int)
         x_test[i] = np.array(list(csv.reader(open(csv_x_test))))
         y_test[i] = np.array(list(csv.reader(open(csv_y_test)))).astype(int)
+        x_val[i] = np.array(list(csv.reader(open(csv_x_val))))
+        y_val[i] = np.array(list(csv.reader(open(csv_y_val)))).astype(int)
 
         # Reshape to tensor input shape for LSTM
         x_train[i] = np.reshape(x_train[i], (x_train[i].shape[0], 1, x_train[i].shape[1]))
         x_test[i] = np.reshape(x_test[i], (x_test[i].shape[0], 1, x_test[i].shape[1]))
+        x_val[i] = np.reshape(x_val[i], (x_val[i].shape[0], 1, x_val[i].shape[1]))
 
-    return x_train, x_test, y_train, y_test
+    return x_train, x_test, x_val, y_val, y_train, y_test
 
 
 def plot_hist(history, i):
@@ -132,22 +140,23 @@ def find_balanced_accuracy(predicted_labels, y_test):
     P = sum(((y_test == [1, 0]).astype(int))[:, 0]) * 1.0
     N = sum(((y_test == [0, 1]).astype(int))[:, 0]) * 1.0
     bal_accuracy = (TP / P + TN / N) / 2.0
-    print("TP:", TP)
-    print("TN:", TN)
-    print("P:", P)
-    print("N:", N)
-    print "bal_accuracy: ", bal_accuracy
+    # print("TP:", TP)
+    # print("TN:", TN)
+    # print("P:", P)
+    # print("N:", N)
+    # print "bal_accuracy: ", bal_accuracy
 
     return bal_accuracy
 
 
-def train_model(x_train, y_train, validation_split, epoch_train, mini_batch_size,
-                x_test, y_test, model, n_folds, learning_rate, optimizer,
-                loss_function, metrics, isloaded, n_layers, layers_to_load, type, unit):
+def train_model(x_train, y_train, x_val, y_val, validation_split, epoch_train, mini_batch_size,
+                                            x_test, y_test, model, n_folds, learning_rate, optimizer, verbose,
+                                            loss_function, metrics, isloaded, n_layers, layers_to_load, type, unit):
 
     bal_accuracy = [[0 for _ in xrange(n_folds)] for _ in xrange(6)]
     models = [[0 for _ in xrange(n_folds)] for _ in xrange(6)]
     predicted_labels = [0 for _ in xrange(n_folds)]
+    models_to_save = [0 for _ in xrange(n_folds)]
 
     model1 = clone_model(model, isloaded, layers_to_load, type, unit, 0)
     model2 = clone_model(model, isloaded, layers_to_load, type, unit, 1)
@@ -161,21 +170,24 @@ def train_model(x_train, y_train, validation_split, epoch_train, mini_batch_size
     callback = [0 for _ in xrange(6)]
 
     tbCallBack = keras.callbacks.TensorBoard(log_dir='./Graph', histogram_freq=0, write_graph=True, write_images=True)
-    EarlyStopping = EarlyStoppingByLossVal(monitor='loss', value=0.001, verbose=1)
-    callback_basic = keras.callbacks.EarlyStopping(monitor='loss', min_delta=0.001, patience=20, verbose=1, mode='min')
+    EarlyStopping = EarlyStoppingByLossVal(monitor='loss', value=0.001, verbose=verbose)
 
-    callback[0] = [EarlyStoppingByLossVal2(monitor='acc', value=0.95, verbose=1)]
-    callback[1] = [EarlyStoppingByLossVal3(monitor='loss', value=0.1, verbose=1)]
-    callback[2] = [EarlyStoppingByLossVal3(monitor='loss', value=0.05, verbose=1)]
-    callback[3] = [EarlyStoppingByLossVal3(monitor='loss', value=0.01, verbose=1)]
-    callback[4] = [EarlyStoppingByLossVal3(monitor='loss', value=0.005, verbose=1)]
+    callback[0] = [EarlyStoppingByLossVal2(monitor='acc', value=0.95, verbose=verbose)]
+    callback[1] = [EarlyStoppingByLossVal3(monitor='loss', value=0.1, verbose=verbose)]
+    callback[2] = [EarlyStoppingByLossVal3(monitor='loss', value=0.05, verbose=verbose)]
+    callback[3] = [EarlyStoppingByLossVal3(monitor='loss', value=0.01, verbose=verbose)]
+    callback[4] = [EarlyStoppingByLossVal3(monitor='loss', value=0.005, verbose=verbose)]
     callback[5] = [EarlyStopping]
 
+    shuffle = True
+    if n_layers > 1:
+        shuffle = False
+
     for callb in callback:
-        model1.fit(x_train[0], y_train[0], epochs=epoch_train, batch_size=mini_batch_size, callbacks=callb, verbose=2)
-        model2.fit(x_train[1], y_train[1], epochs=epoch_train, batch_size=mini_batch_size, callbacks=callb, verbose=2)
-        model3.fit(x_train[2], y_train[2], epochs=epoch_train, batch_size=mini_batch_size, callbacks=callb, verbose=2)
-        model4.fit(x_train[3], y_train[3], epochs=epoch_train, batch_size=mini_batch_size, callbacks=callb, verbose=2)
+        model1.fit(x_train[0], y_train[0], epochs=epoch_train, batch_size=mini_batch_size, callbacks=callb, verbose=verbose, shuffle=shuffle)
+        model2.fit(x_train[1], y_train[1], epochs=epoch_train, batch_size=mini_batch_size, callbacks=callb, verbose=verbose, shuffle=shuffle)
+        model3.fit(x_train[2], y_train[2], epochs=epoch_train, batch_size=mini_batch_size, callbacks=callb, verbose=verbose, shuffle=shuffle)
+        model4.fit(x_train[3], y_train[3], epochs=epoch_train, batch_size=mini_batch_size, callbacks=callb, verbose=verbose, shuffle=shuffle)
         models[callback.index(callb)][0] = model1
         models[callback.index(callb)][0].set_weights(model1.get_weights())
         models[callback.index(callb)][1] = model2
@@ -191,23 +203,31 @@ def train_model(x_train, y_train, validation_split, epoch_train, mini_batch_size
         # plot_hist(history4, 4)
 
         # Predicting the test data labels
-        predicted_labels[0] = model1.predict(x_test[0])
-        predicted_labels[1] = model2.predict(x_test[1])
-        predicted_labels[2] = model3.predict(x_test[2])
-        predicted_labels[3] = model4.predict(x_test[3])
+        predicted_labels[0] = model1.predict(x_val[0])
+        predicted_labels[1] = model2.predict(x_val[1])
+        predicted_labels[2] = model3.predict(x_val[2])
+        predicted_labels[3] = model4.predict(x_val[3])
 
         for i in range(0, n_folds):
-            bal_accuracy[callback.index(callb)][i] = find_balanced_accuracy(predicted_labels[i], y_test[i])
+            bal_accuracy[callback.index(callb)][i] = find_balanced_accuracy(predicted_labels[i], y_val[i])
             # print "bal_accuracy[{}]: {}".format(i, bal_accuracy[i])
 
     print "\nbal_accuracy: ", bal_accuracy, "\n"
-    temp = np.mean(bal_accuracy, axis=1)
-    index = temp.argmax()
-    balanced_accuracy = bal_accuracy[index]
-    models_to_save = models[index]
+
+    for i in xrange(n_folds):
+        temp = [row[i] for row in bal_accuracy]
+        index = temp.index(np.max(temp))
+        models_to_save[i] = models[index][i]
+
+    balanced_accuracy = [0 for _ in xrange(n_folds)]
+    for i in range(0, n_folds):
+        balanced_accuracy[i] = find_balanced_accuracy(models_to_save[i].predict(x_test[i]), y_test[i])
+
+    average_balanced_accuracy = mean(balanced_accuracy)
+
     for model2 in models_to_save:
         model2.save("Models_layers:{}_Type:{}_units:{}_Set:{}.h5".format(n_layers, type, unit,
                                                                         models_to_save.index(model2)))
-    print "balanced_accuracy: ", balanced_accuracy
+    print "Average balanced_accuracy: ", average_balanced_accuracy
 
-    return balanced_accuracy
+    return average_balanced_accuracy
