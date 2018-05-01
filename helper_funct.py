@@ -120,8 +120,9 @@ def clone_model(model, isloaded, layers_to_load, lstm_type, unit, set, custom_ob
     }
     clone = model_from_config(config, custom_objects=custom_objects)
     if isloaded:
-        print "cloning weights:"
-        clone.load_weights("Models_layers:{}_Type:{}_units:{}_Set:{}.h5".format(layers_to_load, lstm_type, unit, set), by_name=True)
+        path = "models_saved/Weights_layers:{}_Type:{}_units:{}_Set:{}.h5".format(layers_to_load, lstm_type, unit, set)
+        print "cloning weights: {}".format(path)
+        clone.load_weights(path, by_name=True)
         # clone.set_weights(model_recovering.get_weights())
 
     return clone
@@ -218,6 +219,9 @@ def train_model(x_train, y_train, x_val, y_val, validation_split, epoch_train, m
         temp = [row[i] for row in bal_accuracy]
         index = temp.index(np.max(temp))
         models_to_save[i] = models[index][i]
+        # print "saving model index: {}".format(index)
+        # print "saving model set: {}".format(i)
+        # print bal_accuracy
 
     balanced_accuracy = [0 for _ in xrange(n_folds)]
     for i in range(0, n_folds):
@@ -226,8 +230,14 @@ def train_model(x_train, y_train, x_val, y_val, validation_split, epoch_train, m
     average_balanced_accuracy = mean(balanced_accuracy)
 
     for model2 in models_to_save:
-        model2.save("Models_layers:{}_Type:{}_units:{}_Set:{}.h5".format(n_layers, type, unit,
-                                                                        models_to_save.index(model2)))
+        path_model = "models_saved/Models_layers:{}_Type:{}_units:{}_Set:{}.h5".format(n_layers, type, unit,
+                                                                        models_to_save.index(model2))
+        path_weight = "models_saved/Weights_layers:{}_Type:{}_units:{}_Set:{}.h5".format(n_layers, type, unit,
+                                                                        models_to_save.index(model2))
+        model2.save(path_model)
+        model2.save_weights(path_weight)
+
+
     print "Average balanced_accuracy: ", average_balanced_accuracy
 
     return average_balanced_accuracy
