@@ -4,6 +4,7 @@ from tensorflow.python.keras.optimizers import RMSprop
 from tensorflow.python.keras.callbacks import Callback
 from tensorflow import keras
 import csv
+import os
 
 
 class EarlyStoppingByLossVal(Callback):
@@ -141,16 +142,16 @@ def find_balanced_accuracy(predicted_labels, y_test):
     P = sum(((y_test == [1, 0]).astype(int))[:, 0]) * 1.0
     N = sum(((y_test == [0, 1]).astype(int))[:, 0]) * 1.0
     bal_accuracy = (TP / P + TN / N) / 2.0
-    # print("TP:", TP)
-    # print("TN:", TN)
-    # print("P:", P)
-    # print("N:", N)
-    # print "bal_accuracy: ", bal_accuracy
+    print("TP:", TP)
+    print("TN:", TN)
+    print("P:", P)
+    print("N:", N)
+    print "bal_accuracy: ", bal_accuracy
 
     return bal_accuracy
 
 
-def train_model(x_train, y_train, x_val, y_val, validation_split, epoch_train, mini_batch_size,
+def train_model(x_train, y_train, x_val, y_val, validation_split, epoch_train, mini_batch_size, shuffle,
                                             x_test, y_test, model, n_folds, learning_rate, optimizer, verbose,
                                             loss_function, metrics, isloaded, n_layers, layers_to_load, type, unit):
 
@@ -180,9 +181,8 @@ def train_model(x_train, y_train, x_val, y_val, validation_split, epoch_train, m
     callback[4] = [EarlyStoppingByLossVal3(monitor='loss', value=0.005, verbose=verbose)]
     callback[5] = [EarlyStopping]
 
-    shuffle = True
-    if n_layers > 1:
-        shuffle = False
+    # if isloaded > 1:
+    #     shuffle = False
 
     for callb in callback:
         model1.fit(x_train[0], y_train[0], epochs=epoch_train, batch_size=mini_batch_size, callbacks=callb, verbose=verbose, shuffle=shuffle)
@@ -219,8 +219,8 @@ def train_model(x_train, y_train, x_val, y_val, validation_split, epoch_train, m
         temp = [row[i] for row in bal_accuracy]
         index = temp.index(np.max(temp))
         models_to_save[i] = models[index][i]
-        # print "saving model index: {}".format(index)
-        # print "saving model set: {}".format(i)
+        print "saving model index: {}".format(index)
+        print "saving model set: {}".format(i)
         # print bal_accuracy
 
     balanced_accuracy = [0 for _ in xrange(n_folds)]
@@ -234,6 +234,11 @@ def train_model(x_train, y_train, x_val, y_val, validation_split, epoch_train, m
                                                                         models_to_save.index(model2))
         path_weight = "models_saved/Weights_layers:{}_Type:{}_units:{}_Set:{}.h5".format(n_layers, type, unit,
                                                                         models_to_save.index(model2))
+
+        if os.path.isfile(path_model):
+            os.remove(path_model)
+            os.remove(path_weight)
+
         model2.save(path_model)
         model2.save_weights(path_weight)
 
